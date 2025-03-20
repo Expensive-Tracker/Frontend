@@ -30,6 +30,7 @@ Thumbs.db
 # Build files
 dist/
 build/
+.next/
 
 # Misc
 coverage/
