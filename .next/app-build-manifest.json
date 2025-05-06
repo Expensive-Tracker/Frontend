@@ -6,15 +6,35 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/page": [
+    "/auth/signin/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
+      "static/chunks/app/auth/signin/page.js"
     ],
-    "/auth/login/page": [
+    "/auth/signup/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/auth/login/page.js"
+      "static/chunks/app/auth/signup/page.js"
+    ],
+    "/auth/forgotPassword/otp/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/auth/forgotPassword/otp/page.js"
+    ],
+    "/auth/forgotPassword/emailVerification/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/auth/forgotPassword/emailVerification/page.js"
+    ],
+    "/auth/forgotPassword/resetPassword/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/auth/forgotPassword/resetPassword/page.js"
+    ],
+    "/Dashboard/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/Dashboard/page.js"
     ]
   }
 }

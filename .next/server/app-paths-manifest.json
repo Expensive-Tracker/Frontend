@@ -1,5 +1,7 @@
 {
   "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/page": "app/page.js",
-  "/auth/login/page": "app/auth/login/page.js"
+  "/Dashboard/page": "app/Dashboard/page.js",
+  "/auth/signin/page": "app/auth/signin/page.js",
+  "/auth/forgotPassword/resetPassword/page": "app/auth/forgotPassword/resetPassword/page.js",
+  "/auth/forgotPassword/emailVerification/page": "app/auth/forgotPassword/emailVerification/page.js"
 }

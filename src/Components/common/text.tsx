@@ -2,16 +2,17 @@ import { textInterface } from "@/util/interface/props";
 import React from "react";
 
 function Text({
-  isDes = false,
+  isDes = true,
   text = "",
   Element = "p",
-  desClass = "text-sm md:text-base",
-  textClass = "text-xl sm:text-2xl",
+  style = "",
 }: Partial<textInterface>) {
+  const desClass = "text-sm md:text-base";
+  const textClass = "text-xl lg:text-2xl";
   return React.createElement(
     Element,
     {
-      className: isDes ? desClass : textClass,
+      className: isDes ? `${desClass} ${style}` : `${textClass} ${style}`,
     },
     text
   );

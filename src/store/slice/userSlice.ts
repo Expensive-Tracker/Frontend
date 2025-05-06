@@ -4,38 +4,37 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 const initialState: userSliceState = {
   userDetail: {
     username: "",
-    password: "",
     email: "",
     _id: "",
   },
+  token: "",
 };
 
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    handleLogin: (
+    handleSignIn: (
       state,
       action: PayloadAction<userSliceState["userDetail"]>
     ) => {
       state.userDetail = action.payload;
     },
+    handleHydrateToken: (
+      state,
+      action: PayloadAction<userSliceState["token"]>
+    ) => {
+      state.token = action.payload;
+    },
     handleChangeUserData: (state, action) => {
       state.userDetail = {
         ...action.payload,
-        password: state.userDetail.password,
-      };
-    },
-    handleChangePassword: (state, action) => {
-      state.userDetail = {
-        ...state.userDetail,
-        password: action.payload,
       };
     },
   },
 });
 
-export const { handleLogin, handleChangePassword, handleChangeUserData } =
+export const { handleSignIn, handleChangeUserData, handleHydrateToken } =
   userSlice.actions;
 const userSliceReducer = userSlice.reducer;
 
