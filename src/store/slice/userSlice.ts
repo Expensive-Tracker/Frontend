@@ -26,6 +26,14 @@ const userSlice = createSlice({
     ) => {
       state.token = action.payload;
     },
+    handleUserSignOut: (state) => {
+      state.userDetail = {
+        _id: "",
+        email: "",
+        username: "",
+      };
+      state.token = "";
+    },
     handleChangeUserData: (state, action) => {
       state.userDetail = {
         ...action.payload,
@@ -34,8 +42,12 @@ const userSlice = createSlice({
   },
 });
 
-export const { handleSignIn, handleChangeUserData, handleHydrateToken } =
-  userSlice.actions;
+export const {
+  handleSignIn,
+  handleChangeUserData,
+  handleHydrateToken,
+  handleUserSignOut,
+} = userSlice.actions;
 const userSliceReducer = userSlice.reducer;
 
 export default userSliceReducer;
