@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { emailValidation, logIn, register } from "@/util/interface/auth";
+import { emailValidation, logIn } from "@/util/interface/auth";
 import { userSliceState } from "@/util/interface/slice";
 import axios from "axios";
 import axiosInstance from "../interpreter";
@@ -23,14 +23,11 @@ async function handleLogIn(userData: logIn) {
   }
 }
 
-async function handleRegister(userData: register) {
+async function handleRegister(userData: FormData) {
   try {
     const response = await axios.post(
       URL + userEndpoint.registration,
-      userData,
-      {
-        headers: { "Content-Type": "application/json" },
-      }
+      userData
     );
     return response.data;
   } catch (err: any) {
@@ -94,7 +91,10 @@ async function handleEmailVerification(userData: emailValidation) {
     return err.response.data.message;
   }
 }
-async function handleOtpVerification(userData: { email: string; otp: number }) {
+async function handleOtpVerification(userData: {
+  email: string;
+  otp: number | string;
+}) {
   try {
     const response = await axios.post(
       URL + userEndpoint.otpVerification,

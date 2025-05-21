@@ -1,4 +1,4 @@
-import { InputHTMLAttributes } from "react";
+import React, { InputHTMLAttributes } from "react";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface textInterface {
@@ -18,4 +18,11 @@ export interface inputInterface extends InputHTMLAttributes<HTMLInputElement> {
   isPass: boolean;
   errorMessage: string;
   register?: any;
+}
+
+export interface navItemInterface {
+  id: number;
+  navName: string;
+  path: string;
+  icon: React.ReactNode;
 }

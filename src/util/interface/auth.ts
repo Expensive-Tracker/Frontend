@@ -14,7 +14,7 @@ export interface emailValidation {
 }
 
 export interface otp {
-  otp: number;
+  otp: number | string;
 }
 
 export interface password {

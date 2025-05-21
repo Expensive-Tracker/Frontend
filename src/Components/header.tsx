@@ -9,6 +9,8 @@ import { CiLogout } from "react-icons/ci";
 import { MdOutlineWbSunny } from "react-icons/md";
 import { handleUserSignOut } from "@/store/slice/userSlice";
 import { useRouter } from "next/navigation";
+import { HiOutlineMenuAlt1 } from "react-icons/hi";
+import { handleMobileMenuOpen } from "@/store/slice/uiSlice";
 
 function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState<boolean>(false);
@@ -51,7 +53,13 @@ function Header() {
   }, []);
 
   return (
-    <header className="w-full sticky top-0 z-50 border-b border-b-[#27282E] flex items-center justify-end px-6 py-3 shadow">
+    <header className="w-full sticky top-0 z-50 border-b border-b-[#27282E] flex items-center lg:justify-end justify-between px-6 py-3 shadow">
+      <div
+        className="p-2 rounded-md hover:bg-[#27282E] border border-[#27282E] transition-all hover:!text-white lg:hidden"
+        onClick={() => dispatch(handleMobileMenuOpen())}
+      >
+        <HiOutlineMenuAlt1 />
+      </div>
       <div className="flex items-center gap-4 ">
         {theme === "dark" ? (
           <MdOutlineWbSunny
@@ -72,7 +80,16 @@ function Header() {
             className="flex items-center gap-1.5"
             onClick={handleShowUserMenu}
           >
-            <RxAvatar size={24} />
+            {userData?.profilePic ? (
+              <img
+                src={userData?.profilePic}
+                className="object-cover rounded-4xl w-10 h-10"
+                alt="Avatar"
+              />
+            ) : (
+              <RxAvatar size={24} />
+            )}
+
             <span className="hidden md:inline">{userData.username}</span>
             <IoIosArrowDown />
           </div>

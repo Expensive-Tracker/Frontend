@@ -4,10 +4,12 @@ import storage from "redux-persist/lib/storage";
 import { persistReducer } from "redux-persist";
 import { persistStore } from "redux-persist";
 import themeSliceReduce from "./slice/themeSlice";
+import uiSliceReducer from "./slice/uiSlice";
 
 const rootReducer = combineReducers({
   user: userSliceReducer,
   theme: themeSliceReduce,
+  uiSlice: uiSliceReducer,
 });
 
 const key = "user Data";

@@ -2,10 +2,13 @@
 import { imagePath } from "@/util/constant/imagePath";
 import Image from "next/image";
 import Text from "./common/text";
-import { IoMdCheckmark } from "react-icons/io";
-import { useSelector } from "react-redux";
+import { IoMdCheckmark, IoMdMoon } from "react-icons/io";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import Header from "./header";
+import { MdOutlineWbSunny } from "react-icons/md";
+import { handleThemeChange } from "@/store/slice/themeSlice";
+import SideBar from "./sideBar";
 
 export default function ClientWrapper({
   children,
@@ -14,22 +17,49 @@ export default function ClientWrapper({
 }) {
   const authToken = useSelector((state: RootState) => state.user.token);
   const theme = useSelector((state: RootState) => state.theme.theme);
-
+  const uiSideBar = useSelector((state: RootState) => state.uiSlice.sidebar);
+  const dispatch = useDispatch();
+  function handleChangeTheme() {
+    dispatch(handleThemeChange());
+  }
   return (
     <div
       className={`${
         theme === "dark"
           ? "dark:bg-[#1B1C21] dark:text-white"
           : "bg-white  text-black"
-      } transition-all`}
+      } transition-all h-screen`}
     >
-      {authToken !== "" ? (
+      {authToken !== "" || window.location.href.includes("imageUpload") ? (
         <div className="relative">
-          <Header />
-          {children}
+          {!window.location.href.includes("imageUpload") && <Header />}
+          {!window.location.href.includes("imageUpload") && <SideBar />}
+          <div
+            className={` ml-auto p-6
+              ${
+                uiSideBar.isOpen || uiSideBar.isHovered
+                  ? "w-[calc(100%_-_220px)]"
+                  : "w-[calc(100%_-_60px)]"
+              }
+              `}
+          >
+            {children}
+          </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 items-center justify-center lg:grid-cols-2 h-screen">
+        <div className="grid grid-cols-1 relative items-center justify-center lg:grid-cols-2 h-screen ">
+          <div
+            className={`absolute md:bottom-6 lg:right-10 p-3 rounded-full text-black hover:bg-gray-200 transition-all bg-white shadow-md bottom-4 right-4 md:right-6  ${
+              theme === "dark" ? "shadow-white" : "shadow-gray-700"
+            } cursor-pointer`}
+            onClick={handleChangeTheme}
+          >
+            {theme === "dark" ? (
+              <MdOutlineWbSunny size={24} />
+            ) : (
+              <IoMdMoon size={24} />
+            )}
+          </div>
           <div className="  h-screen bg-[#15161A] hidden lg:block !text-white">
             <div className="justify-center gap-12 flex flex-col items-center w-[381px] m-auto h-screen">
               <Image

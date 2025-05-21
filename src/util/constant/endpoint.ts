@@ -8,6 +8,9 @@ const endpoints = {
     emailValidation: "/email-valid",
     otpVerification: "/otp-verification",
   },
+  transaction: {
+    getTransaction: "",
+  },
 };
 
 export default endpoints;

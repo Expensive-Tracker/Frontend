@@ -53,7 +53,7 @@ function Login() {
   }
 
   return (
-    <div className="flex sm:w-[450px] w-[320px] lg:w-[400px] xl:w-[450px] items-center flex-col justify-center">
+    <div className="flex sm:w-[450px] w-[304px] lg:w-[400px] xl:w-[450px] items-center flex-col justify-center">
       <Text
         Element="h2"
         style="xl:!text-[32px] text-[20px] md:text-[28px] leading-[24px]"
@@ -69,7 +69,7 @@ function Login() {
       {err.showErr && (
         <p className="text-red-400 mt-3 text-base">{err.errMsg}</p>
       )}
-      <div className=" lg:mt-[44px] w-full md:mt-[32px] mt-[26px] xl:mt-[81px] ">
+      <div className=" lg:mt-[38px] w-full md:mt-[32px] mt-[26px]">
         <form onSubmit={handleSubmit(handleSubmitForm)} className="w-full">
           <InputAndLabel
             register={register}
@@ -88,13 +88,15 @@ function Login() {
             name="password"
             placeHolder="Enter Password"
           />
-          <Link
-            href="/auth/forgotPassword/emailVerification"
-            className="text-right mt-2 opacity-70 text-sm block"
-          >
-            Forgot password?
-          </Link>
-          <button className="block w-full  bg-[#7688C9] md:mt-8 mt-4 text-black py-3.5 rounded-md cursor-pointer hover:opacity-70 transition-all">
+          <div className="text-right mt-2">
+            <Link
+              href="/auth/forgotPassword/emailVerification"
+              className=" opacity-70 text-sm "
+            >
+              Forgot password?
+            </Link>
+          </div>
+          <button className="block w-full bg-[#7688C9] md:mt-5 mt-4 text-white py-3.5 rounded-md cursor-pointer hover:opacity-70 transition-all">
             Login
           </button>
         </form>

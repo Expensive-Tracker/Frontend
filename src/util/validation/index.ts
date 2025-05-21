@@ -1,4 +1,5 @@
-import { number, object, ref, string } from "yup";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { mixed, object, ref, string } from "yup";
 
 export const loginValidationSchema = object({
   userNameOrEmail: string()
@@ -38,13 +39,12 @@ export const emailValidationSchema = object({
 });
 
 export const otpValidationSchema = object({
-  otp: number()
-    .typeError("Otp must be a number")
-    .required("Otp is required")
-    .positive("Otp must be a positive number")
-    .integer("Otp must be an integer")
-    .min(1000, "Otp must be 4 digits")
-    .max(9999, "Otp must be 4 digits"),
+  otp: mixed<string | number>()
+    .test("is-valid-otp", "Otp must be a 4-digit number", (value: any) => {
+      const otpStr = String(value);
+      return /^\d{4}$/.test(otpStr);
+    })
+    .required("Otp is required"),
 });
 
 export const passwordValidationSchema = object({

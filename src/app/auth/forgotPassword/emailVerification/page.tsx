@@ -69,7 +69,7 @@ function EmailValidation() {
             divStyle="mt-6"
             placeHolder="Enter Email"
           />
-          <button className="block w-full bg-[#7688C9] md:mt-8 mt-4 text-black py-3.5 rounded-md cursor-pointer hover:opacity-70 transition-all">
+          <button className="block w-full bg-[#7688C9] md:mt-5 mt-4 text-white py-3.5 rounded-md cursor-pointer hover:opacity-70 transition-all">
             Send Otp
           </button>
         </form>

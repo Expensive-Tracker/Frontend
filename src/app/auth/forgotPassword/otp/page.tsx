@@ -29,7 +29,7 @@ function Otp() {
     formState: { errors },
   } = useForm<otp>({
     defaultValues: {
-      otp: 0,
+      otp: "",
     },
     resolver: yupResolver(otpValidationSchema),
   });
@@ -75,9 +75,8 @@ function Otp() {
             inputStyle="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             divStyle="mt-6"
             placeHolder="Enter Otp"
-            min="1000"
           />
-          <button className="block w-full bg-[#7688C9] md:mt-8 mt-4 text-black py-3.5 rounded-md cursor-pointer hover:opacity-70 transition-all">
+          <button className="block w-full bg-[#7688C9] md:mt-5 mt-4 text-white py-3.5 rounded-md cursor-pointer hover:opacity-70 transition-all">
             Submit
           </button>
         </form>
