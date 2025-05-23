@@ -7,5 +7,5 @@ export default function Home() {
   if (!authToken) {
     redirect("/auth/signin");
   }
-  return <></>;
+  return <>hello</>;
 }

@@ -9,7 +9,12 @@ const endpoints = {
     otpVerification: "/otp-verification",
   },
   transaction: {
-    getTransaction: "",
+    newTransaction: "/transactions",
+    getUserTransaction: "/transactions",
+    specificTransition: "/transactions/:id",
+    updTransition: "/transactions/:id",
+    deleteTransition: "/transactions/:id",
+    totalExpense: "/transactions/summary",
   },
 };
 

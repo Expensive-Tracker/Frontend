@@ -9,6 +9,7 @@ import Header from "./header";
 import { MdOutlineWbSunny } from "react-icons/md";
 import { handleThemeChange } from "@/store/slice/themeSlice";
 import SideBar from "./sideBar";
+import { useEffect } from "react";
 
 export default function ClientWrapper({
   children,
@@ -22,24 +23,38 @@ export default function ClientWrapper({
   function handleChangeTheme() {
     dispatch(handleThemeChange());
   }
+
+  useEffect(() => {
+    function colorBodyChange() {
+      const body = document.body;
+      body.classList.remove(
+        "dark:bg-[#1B1C21]",
+        "dark:text-white",
+        "bg-white",
+        "text-black"
+      );
+
+      if (theme === "dark") {
+        body.classList.add("dark:bg-[#1B1C21]", "dark:text-white");
+      } else {
+        body.classList.add("bg-white", "text-black");
+      }
+    }
+
+    colorBodyChange();
+  }, [theme]);
   return (
-    <div
-      className={`${
-        theme === "dark"
-          ? "dark:bg-[#1B1C21] dark:text-white"
-          : "bg-white  text-black"
-      } transition-all h-screen`}
-    >
+    <div className={`h-full  transition-all `}>
       {authToken !== "" || window.location.href.includes("imageUpload") ? (
         <div className="relative">
           {!window.location.href.includes("imageUpload") && <Header />}
           {!window.location.href.includes("imageUpload") && <SideBar />}
           <div
-            className={` ml-auto p-6
+            className={`mt-[65px] max-w-[1920px] mx-auto
               ${
                 uiSideBar.isOpen || uiSideBar.isHovered
-                  ? "w-[calc(100%_-_220px)]"
-                  : "w-[calc(100%_-_60px)]"
+                  ? "lg:pl-[220px]"
+                  : "lg:pl-[60px]"
               }
               `}
           >
@@ -47,7 +62,7 @@ export default function ClientWrapper({
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 relative items-center justify-center lg:grid-cols-2 h-screen ">
+        <div className="grid grid-cols-1 relative items-center justify-center lg:grid-cols-2 h-full ">
           <div
             className={`absolute md:bottom-6 lg:right-10 p-3 rounded-full text-black hover:bg-gray-200 transition-all bg-white shadow-md bottom-4 right-4 md:right-6  ${
               theme === "dark" ? "shadow-white" : "shadow-gray-700"
@@ -61,7 +76,7 @@ export default function ClientWrapper({
             )}
           </div>
           <div className="  h-screen bg-[#15161A] hidden lg:block !text-white">
-            <div className="justify-center gap-12 flex flex-col items-center w-[381px] m-auto h-screen">
+            <div className="justify-center gap-12 flex flex-col items-center w-[381px] m-auto h-full">
               <Image
                 src={imagePath.authBanner}
                 alt="auth banner"

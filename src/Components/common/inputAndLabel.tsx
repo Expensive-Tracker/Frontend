@@ -15,16 +15,17 @@ function InputAndLabel({
   placeHolder,
   register,
   errorMessage,
+  labelStyle = "",
   ...rest
 }: Partial<inputInterface>) {
   const [showPass, setShowPass] = useState<boolean>(false);
   const commonInputStyle =
-    "p-2.5 border-[#27282E] w-full border rounded-md focus:outline-none" +
+    "p-2.5 border-[#27282E] w-full border rounded-md focus:outline-none " +
     inputStyle;
   const theme = useSelector((state: RootState) => state.theme.theme);
   return (
     <div className={`flex gap-2 w-full flex-col ${divStyle}`}>
-      <label className="capitalize text-sm" id={name}>
+      <label className={`capitalize text-sm ${labelStyle}`} id={name}>
         {labelText}
       </label>
       {isPass ? (

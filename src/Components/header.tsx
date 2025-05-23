@@ -31,6 +31,9 @@ function Header() {
   function handleLogOut() {
     dispatch(handleUserSignOut());
     localStorage.removeItem("authToken");
+    localStorage.removeItem("OtpToken");
+    localStorage.removeItem("email");
+    localStorage.removeItem("correctOtpToken");
     setTimeout(() => {
       router.push("/auth/signin");
     }, 3000);
@@ -53,7 +56,11 @@ function Header() {
   }, []);
 
   return (
-    <header className="w-full sticky top-0 z-50 border-b border-b-[#27282E] flex items-center lg:justify-end justify-between px-6 py-3 shadow">
+    <header
+      className={`w-full fixed top-0 z-50 border-b border-b-[#27282E] flex items-center lg:justify-end justify-between px-6 py-3 shadow ${
+        theme === "dark" ? "bg-[#1B1C21]" : "bg-white"
+      }`}
+    >
       <div
         className="p-2 rounded-md hover:bg-[#27282E] border border-[#27282E] transition-all hover:!text-white lg:hidden"
         onClick={() => dispatch(handleMobileMenuOpen())}

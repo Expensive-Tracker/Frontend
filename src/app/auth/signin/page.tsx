@@ -43,6 +43,8 @@ function Login() {
     const respond = await handleLogIn(userData);
     if (typeof respond !== "string") {
       delete respond.response.detail.password;
+      console.log(respond.response.detail);
+
       dispatch(handleSignIn(respond.response.detail));
       localStorage.setItem("authToken", respond.response.token);
       dispatch(handleHydrateToken(respond.response.token));

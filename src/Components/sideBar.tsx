@@ -11,6 +11,7 @@ import {
   handleOpenAndClose,
 } from "@/store/slice/uiSlice";
 import { usePathname } from "next/navigation";
+import { BiWalletAlt } from "react-icons/bi";
 
 const SideBar = () => {
   const theme = useSelector((state: RootState) => state.theme.theme);
@@ -37,12 +38,22 @@ const SideBar = () => {
       <div
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className={`absolute ${sidebarWidth} z-50 left-0 top-0 h-screen border-r border-collapse lg:block hidden border-r-[#27282E] transition-all`}
+        className={`fixed ${sidebarWidth} z-50 left-0 top-0 h-full border-r border-collapse lg:block hidden border-r-[#27282E] transition-all`}
       >
         {/* sidebar header */}
-        <div className="px-6 py-3 pb-2.5 flex items-start  flex-col gap-0 relative">
-          <Text Element="h2" text="Expense" style="font-bold" />
-          <Text Element="p" text="Tracker" style="font-light -mt-1.5" isDes />
+        <div className="px-6 py-1.5 pb-2.5 flex items-start  flex-col gap-0 relative">
+          <div className="flex items-center gap-2">
+            <BiWalletAlt size={25} />
+            <div>
+              <Text Element="h2" text="Expense" style="font-bold" />
+              <Text
+                Element="p"
+                text="Tracker"
+                style="font-light -mt-1.5"
+                isDes
+              />
+            </div>
+          </div>
           <div
             className={`absolute  top-4 hidden -right-4 lg:block cursor-pointer z-50 transition-all p-2 shadow rounded-full ${
               uiData.isOpen ? "rotate-0" : "rotate-180"
@@ -63,7 +74,7 @@ const SideBar = () => {
           </div>
         </div>
         {/* sideBar body */}
-        <div className="px-3 py-4 h-screen overflow-visible">
+        <div className={`px-3 py-4 h-full overflow-y-hidden`}>
           <ul className="flex items-start gap-5 flex-col">
             {navItem.map((item: navItemInterface) => {
               const isExpanded = uiData.isOpen || uiData.isHovered;
@@ -109,8 +120,8 @@ const SideBar = () => {
           uiData.mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className=" h-screen bg-white shadow z-[100]">
-          <div className="px-3 py-4 h-screen">
+        <div className=" h-full bg-white shadow z-[100]">
+          <div className="px-3 py-4 h-full">
             <ul className="flex items-start gap-5 flex-col">
               {navItem.map((item: navItemInterface) => (
                 <li
@@ -129,7 +140,7 @@ const SideBar = () => {
           </div>
         </div>
         <div
-          className={`h-screen bg-black/20 backdrop-blur-sm z-[50] transition-opacity duration-300 ${
+          className={`h-full bg-black/20 backdrop-blur-sm z-[50] transition-opacity duration-300 ${
             uiData.mobileOpen ? "opacity-100" : "opacity-0"
           }`}
         ></div>
