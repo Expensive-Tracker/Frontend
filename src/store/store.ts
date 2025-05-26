@@ -17,6 +17,7 @@ const key = "user Data";
 const persistConfiguration = {
   key,
   storage,
+  blacklist: ["uiSlice"],
 };
 
 const persistRootReducer = persistReducer(persistConfiguration, rootReducer);

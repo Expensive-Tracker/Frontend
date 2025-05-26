@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import Text from "@/components/common/text";
+import Text from "@/components/common/text/text";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import React, { useEffect, useRef, useState } from "react";
 import { register as registerType } from "@/util/interface/auth";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { registerValidationSchema } from "@/util/validation";
-import InputAndLabel from "@/components/common/inputAndLabel";
+import InputAndLabel from "@/components/common/input/inputAndLabel";
 import { redirect, useRouter } from "next/navigation";
 import { RxAvatar } from "react-icons/rx";
 import { useDispatch } from "react-redux";
@@ -78,8 +78,6 @@ function Register() {
         formData.append("profilePic", fileData);
       }
       try {
-        console.log(formData);
-
         const response = await handleRegister(formData);
         if (typeof response !== "string") {
           const user = response.data.data;

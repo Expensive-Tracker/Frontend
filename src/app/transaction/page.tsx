@@ -13,15 +13,16 @@ import {
 import { FaEdit, FaPlus } from "react-icons/fa";
 import { FiDelete } from "react-icons/fi";
 import { formatDate } from "@/util/services/date";
-import Badge from "@/components/common/badge";
+import Badge from "@/components/common/badge/badge";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { Transaction } from "@/util/interface/api";
-import Button from "@/components/common/button";
-import InputAndLabel from "@/components/common/inputAndLabel";
+import Button from "@/components/common/button/button";
+import InputAndLabel from "@/components/common/input/inputAndLabel";
 import { useDebounce } from "@uidotdev/usehooks";
 import { TfiAngleDown } from "react-icons/tfi";
 import { handleGetTransaction } from "@/util/api/apis/transaction";
+import Modal from "@/components/common/modal/modal";
 
 const TransactionTable = () => {
   const theme = useSelector((state: RootState) => state.theme.theme);
@@ -53,7 +54,15 @@ const TransactionTable = () => {
     }, 300);
 
     return () => clearTimeout(delayDebounce);
-  }, [pagination.limit, pagination.page, debounceSearch]);
+  }, [
+    pagination.limit,
+    pagination.page,
+    debounceSearch,
+    filter.date.endDate,
+    filter.date.startDate,
+    filter.category,
+    filter.type,
+  ]);
 
   function handleChangeFilter(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -99,8 +108,6 @@ const TransactionTable = () => {
           },
         }
       );
-      console.log(userId);
-
       setData(response.result.data.transactions);
       setPagination((prev) => ({
         ...prev,
@@ -232,7 +239,7 @@ const TransactionTable = () => {
             <button
               onClick={() => handleTransactionEdit(row.original._id)}
               title="Edit"
-              className={`p-2 border rounded-full hover:text-blue-600 ${
+              className={`p-2 border rounded-full transition-colors hover:text-blue-600 ${
                 theme === "dark"
                   ? "border-gray-600 text-gray-300 hover:border-blue-400"
                   : "border-gray-300 text-gray-600"
@@ -243,7 +250,7 @@ const TransactionTable = () => {
             <button
               onClick={() => handleTransactionDelete(row.original._id)}
               title="Delete"
-              className={`p-2 border rounded-full hover:text-red-600 ${
+              className={`p-2 border rounded-full transition-colors hover:text-red-600 ${
                 theme === "dark"
                   ? "border-gray-600 text-gray-300 hover:border-red-400"
                   : "border-gray-300 text-gray-600"
@@ -290,7 +297,13 @@ const TransactionTable = () => {
               className="w-full flex justify-between items-center"
               onClick={() => setShowFilter((prev) => !prev)}
             >
-              Filter <TfiAngleDown size={14} />
+              Filter{" "}
+              <TfiAngleDown
+                className={`${
+                  showFilter ? "rotate-180  " : "rotate-0"
+                } transition-all`}
+                size={14}
+              />
             </Button>
             {showFilter && (
               <div
@@ -556,6 +569,7 @@ const TransactionTable = () => {
           Next
         </button>
       </div>
+      <Modal />
     </div>
   );
 };

@@ -105,7 +105,7 @@ async function handleOtpVerification(userData: {
     );
     return response.data;
   } catch (err: any) {
-    console.log(err);
+    console.error(err);
     return err.response.data.message;
   }
 }

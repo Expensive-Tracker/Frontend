@@ -1,4 +1,3 @@
-import { ColumnDef, SortingState } from "@tanstack/react-table";
 import React, { InputHTMLAttributes } from "react";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -35,18 +34,7 @@ export interface buttonProps
   className?: string;
 }
 
-export interface DataTableProps<T> {
-  data: T[];
-  columns: ColumnDef<T>[];
-  loading?: boolean;
-  theme?: "light" | "dark";
-  sorting?: SortingState;
-  onSortingChange?: (updater: SortingState) => void;
-  pagination: {
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-  onPaginationChange: (page: number) => void;
-  onRowsPerPageChange: (limit: number) => void;
+export interface modalProps {
+  id: "add" | "edit" | "delete" | string;
+  transactionId: string | number;
 }

@@ -1,6 +1,6 @@
 "use client";
-import InputAndLabel from "@/components/common/inputAndLabel";
-import Text from "@/components/common/text";
+import InputAndLabel from "@/components/common/input/inputAndLabel";
+import Text from "@/components/common/text/text";
 import { handleEmailVerification } from "@/util/api/apis/userApi";
 import { emailValidation } from "@/util/interface/auth";
 import { emailValidationSchema } from "@/util/validation";

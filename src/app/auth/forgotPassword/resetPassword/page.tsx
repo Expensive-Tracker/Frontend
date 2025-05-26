@@ -1,6 +1,6 @@
 "use client";
-import InputAndLabel from "@/components/common/inputAndLabel";
-import Text from "@/components/common/text";
+import InputAndLabel from "@/components/common/input/inputAndLabel";
+import Text from "@/components/common/text/text";
 import { handleResetPassword } from "@/util/api/apis/userApi";
 import { password } from "@/util/interface/auth";
 import { passwordValidationSchema } from "@/util/validation";
@@ -21,7 +21,6 @@ function ResetPassword() {
     localStorage.removeItem("OtpToken");
     const otpToken = localStorage.getItem("correctOtpToken");
     if (!otpToken) {
-      console.log("err");
       redirect("/auth/forgotPassword/emailVerification");
     }
   });

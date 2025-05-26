@@ -7,6 +7,9 @@ const initialState: uiSliceState = {
     isOpen: true,
     mobileOpen: false,
   },
+  modal: {
+    isOpen: false,
+  },
 };
 
 const uiSlice = createSlice({
@@ -25,6 +28,9 @@ const uiSlice = createSlice({
     handleHoverOut: (state) => {
       state.sidebar.isHovered = false;
     },
+    handleOpenAndCloseModal: (state) => {
+      state.modal.isOpen = !state.modal.isOpen;
+    },
   },
 });
 
@@ -33,6 +39,7 @@ export const {
   handleHoverOut,
   handleOpenAndClose,
   handleMobileMenuOpen,
+  handleOpenAndCloseModal,
 } = uiSlice.actions;
 
 const uiSliceReducer = uiSlice.reducer;

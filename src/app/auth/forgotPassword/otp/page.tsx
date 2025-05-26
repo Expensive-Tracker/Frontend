@@ -1,6 +1,6 @@
 "use client";
-import InputAndLabel from "@/components/common/inputAndLabel";
-import Text from "@/components/common/text";
+import InputAndLabel from "@/components/common/input/inputAndLabel";
+import Text from "@/components/common/text/text";
 import { handleOtpVerification } from "@/util/api/apis/userApi";
 import { otp } from "@/util/interface/auth";
 import { otpValidationSchema } from "@/util/validation";

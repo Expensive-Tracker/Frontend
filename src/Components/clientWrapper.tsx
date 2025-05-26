@@ -1,7 +1,7 @@
 "use client";
 import { imagePath } from "@/util/constant/imagePath";
 import Image from "next/image";
-import Text from "./common/text";
+import Text from "./common/text/text";
 import { IoMdCheckmark, IoMdMoon } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
@@ -43,6 +43,7 @@ export default function ClientWrapper({
 
     colorBodyChange();
   }, [theme]);
+
   return (
     <div className={`h-full  transition-all `}>
       {authToken !== "" || window.location.href.includes("imageUpload") ? (

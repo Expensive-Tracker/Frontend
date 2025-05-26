@@ -1,5 +1,5 @@
 import React from "react";
-import Text from "./common/text";
+import Text from "./common/text/text";
 import navItem from "@/util/constant/navItem";
 import { navItemInterface } from "@/util/interface/props";
 import Link from "next/link";

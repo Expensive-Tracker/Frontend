@@ -1,5 +1,5 @@
 "use client";
-import Text from "@/components/common/text";
+import Text from "@/components/common/text/text";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import React, { useEffect, useState } from "react";
@@ -7,7 +7,7 @@ import { logIn } from "@/util/interface/auth";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginValidationSchema } from "@/util/validation";
 import { handleLogIn } from "@/util/api/apis/userApi";
-import InputAndLabel from "@/components/common/inputAndLabel";
+import InputAndLabel from "@/components/common/input/inputAndLabel";
 import { useDispatch } from "react-redux";
 import { handleHydrateToken, handleSignIn } from "@/store/slice/userSlice";
 import { redirect } from "next/navigation";
@@ -43,8 +43,6 @@ function Login() {
     const respond = await handleLogIn(userData);
     if (typeof respond !== "string") {
       delete respond.response.detail.password;
-      console.log(respond.response.detail);
-
       dispatch(handleSignIn(respond.response.detail));
       localStorage.setItem("authToken", respond.response.token);
       dispatch(handleHydrateToken(respond.response.token));

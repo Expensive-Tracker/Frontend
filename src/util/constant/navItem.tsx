@@ -1,7 +1,7 @@
 import { TfiHome } from "react-icons/tfi";
 import { CiViewList } from "react-icons/ci";
 import { FiBarChart } from "react-icons/fi";
-import { navItemInterface } from "../interface/props";
+import { navItemInterface } from "../util/interface/props";
 
 const navItem: navItemInterface[] = [
   {
