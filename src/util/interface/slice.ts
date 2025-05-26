@@ -22,6 +22,7 @@ export interface uiSliceState {
     mobileOpen: boolean;
     isOpen: boolean;
   };
+  refetch: boolean;
   modal: {
     isOpen: boolean;
   };

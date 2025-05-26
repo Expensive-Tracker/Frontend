@@ -36,5 +36,5 @@ export interface buttonProps
 
 export interface modalProps {
   id: "add" | "edit" | "delete" | string;
-  transactionId: string | number;
+  transactionId: string;
 }

@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import React, { useEffect, useRef, useState } from "react";
 import { register as registerType } from "@/util/interface/auth";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { registerValidationSchema } from "@/util/validation";
+import { registerValidationSchema } from "@/util/validation/authValidaion";
 import InputAndLabel from "@/components/common/input/inputAndLabel";
 import { redirect, useRouter } from "next/navigation";
 import { RxAvatar } from "react-icons/rx";

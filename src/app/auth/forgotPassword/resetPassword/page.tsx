@@ -3,7 +3,7 @@ import InputAndLabel from "@/components/common/input/inputAndLabel";
 import Text from "@/components/common/text/text";
 import { handleResetPassword } from "@/util/api/apis/userApi";
 import { password } from "@/util/interface/auth";
-import { passwordValidationSchema } from "@/util/validation";
+import { passwordValidationSchema } from "@/util/validation/authValidaion";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
 import { redirect } from "next/navigation";

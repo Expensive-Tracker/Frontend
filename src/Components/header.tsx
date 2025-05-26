@@ -11,6 +11,7 @@ import { handleUserSignOut } from "@/store/slice/userSlice";
 import { useRouter } from "next/navigation";
 import { HiOutlineMenuAlt1 } from "react-icons/hi";
 import { handleMobileMenuOpen } from "@/store/slice/uiSlice";
+import Image from "next/image";
 
 function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState<boolean>(false);
@@ -62,7 +63,7 @@ function Header() {
       }`}
     >
       <div
-        className="p-2 rounded-md hover:bg-[#27282E] border border-[#27282E] transition-all hover:!text-white lg:hidden"
+        className="p-2 rounded-md hover:bg-[#27282E] cursor-pointer border border-[#27282E] transition-all hover:!text-white lg:hidden"
         onClick={() => dispatch(handleMobileMenuOpen())}
       >
         <HiOutlineMenuAlt1 />
@@ -88,7 +89,7 @@ function Header() {
             onClick={handleShowUserMenu}
           >
             {userData?.profilePic ? (
-              <img
+              <Image
                 src={userData?.profilePic}
                 className="object-cover rounded-4xl w-10 h-10"
                 alt="Avatar"

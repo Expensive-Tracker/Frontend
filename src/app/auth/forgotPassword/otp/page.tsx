@@ -3,7 +3,7 @@ import InputAndLabel from "@/components/common/input/inputAndLabel";
 import Text from "@/components/common/text/text";
 import { handleOtpVerification } from "@/util/api/apis/userApi";
 import { otp } from "@/util/interface/auth";
-import { otpValidationSchema } from "@/util/validation";
+import { otpValidationSchema } from "@/util/validation/authValidaion";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";

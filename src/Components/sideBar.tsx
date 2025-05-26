@@ -116,7 +116,7 @@ const SideBar = () => {
       </div>
       {/* mobile */}
       <div
-        className={`lg:hidden absolute grid grid-cols-2 items-start w-screen  transition-all ${
+        className={`lg:hidden absolute grid grid-cols-2 items-start h-screen w-screen z-[1000] -top-1.5  transition-all ${
           uiData.mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >

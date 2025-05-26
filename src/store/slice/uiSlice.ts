@@ -7,6 +7,7 @@ const initialState: uiSliceState = {
     isOpen: true,
     mobileOpen: false,
   },
+  refetch: false,
   modal: {
     isOpen: false,
   },
@@ -31,6 +32,9 @@ const uiSlice = createSlice({
     handleOpenAndCloseModal: (state) => {
       state.modal.isOpen = !state.modal.isOpen;
     },
+    handleRefetch: (state) => {
+      state.refetch = !state.refetch;
+    },
   },
 });
 
@@ -39,6 +43,7 @@ export const {
   handleHoverOut,
   handleOpenAndClose,
   handleMobileMenuOpen,
+  handleRefetch,
   handleOpenAndCloseModal,
 } = uiSlice.actions;
 

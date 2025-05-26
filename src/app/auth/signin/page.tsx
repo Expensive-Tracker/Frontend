@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import React, { useEffect, useState } from "react";
 import { logIn } from "@/util/interface/auth";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { loginValidationSchema } from "@/util/validation";
+import { loginValidationSchema } from "@/util/validation/authValidaion";
 import { handleLogIn } from "@/util/api/apis/userApi";
 import InputAndLabel from "@/components/common/input/inputAndLabel";
 import { useDispatch } from "react-redux";

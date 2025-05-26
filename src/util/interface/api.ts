@@ -11,7 +11,7 @@ export interface Transaction {
 }
 
 export interface bodyTransaction {
-  _id: string | number;
+  _id: string;
   filter?: {
     date: {
       startDate: string;

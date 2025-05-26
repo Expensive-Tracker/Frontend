@@ -14,7 +14,7 @@ import { FaEdit, FaPlus } from "react-icons/fa";
 import { FiDelete } from "react-icons/fi";
 import { formatDate } from "@/util/services/date";
 import Badge from "@/components/common/badge/badge";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { Transaction } from "@/util/interface/api";
 import Button from "@/components/common/button/button";
@@ -23,13 +23,23 @@ import { useDebounce } from "@uidotdev/usehooks";
 import { TfiAngleDown } from "react-icons/tfi";
 import { handleGetTransaction } from "@/util/api/apis/transaction";
 import Modal from "@/components/common/modal/modal";
+import { handleOpenAndCloseModal, handleRefetch } from "@/store/slice/uiSlice";
 
 const TransactionTable = () => {
   const theme = useSelector((state: RootState) => state.theme.theme);
   const userId = useSelector((state: RootState) => state.user.userDetail._id);
+  const isOpen = useSelector((state: RootState) => state.uiSlice.modal.isOpen);
+  const refetch = useSelector((state: RootState) => state.uiSlice.refetch);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [data, setData] = useState<Transaction[]>();
   const [showFilter, setShowFilter] = useState<boolean>(false);
+  const [modalDetail, setModalDetail] = useState<{
+    modalId: string;
+    transactionId: string;
+  }>({
+    modalId: "add",
+    transactionId: "",
+  });
   const [loading, setLoading] = useState<boolean>(false);
   const [search, setSearch] = useState<string>("");
   const debounceSearch = useDebounce(search, 300);
@@ -47,8 +57,10 @@ const TransactionTable = () => {
     total: 1,
     totalPages: 1,
   });
+  const dispatch = useDispatch();
 
   useEffect(() => {
+    if (refetch) dispatch(handleRefetch());
     const delayDebounce = setTimeout(() => {
       fetchTransactionList();
     }, 300);
@@ -62,6 +74,7 @@ const TransactionTable = () => {
     filter.date.startDate,
     filter.category,
     filter.type,
+    refetch,
   ]);
 
   function handleChangeFilter(
@@ -84,10 +97,6 @@ const TransactionTable = () => {
         [id]: value,
       }));
     }
-  }
-
-  function handleTransactionEdit(id: number | string) {
-    console.log("Edit transaction:", id);
   }
 
   const fetchTransactionList = useCallback(async () => {
@@ -118,11 +127,7 @@ const TransactionTable = () => {
     } finally {
       setLoading(false);
     }
-  }, [pagination.page, pagination.limit, debounceSearch, filter]);
-
-  const handleTransactionDelete = (id: number | string) => {
-    console.log("Delete transaction:", id);
-  };
+  }, [pagination.page, pagination.limit, debounceSearch, filter, refetch]);
 
   const handleChangeRowsPerPage = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newLimit = Number(e.target.value);
@@ -190,7 +195,7 @@ const TransactionTable = () => {
           <span
             className={`line-clamp-2 ${
               theme === "dark" ? "text-gray-300" : "text-gray-600"
-            }`}
+            } `}
           >
             {desc || "—"}
           </span>
@@ -237,9 +242,15 @@ const TransactionTable = () => {
         return (
           <div className="flex gap-2 justify-end">
             <button
-              onClick={() => handleTransactionEdit(row.original._id)}
+              onClick={() => {
+                setModalDetail(() => ({
+                  modalId: "edit",
+                  transactionId: String(row.original._id),
+                }));
+                dispatch(handleOpenAndCloseModal());
+              }}
               title="Edit"
-              className={`p-2 border rounded-full transition-colors hover:text-blue-600 ${
+              className={`p-2 border rounded-full transition-colors hover:text-blue-600 cursor-pointer ${
                 theme === "dark"
                   ? "border-gray-600 text-gray-300 hover:border-blue-400"
                   : "border-gray-300 text-gray-600"
@@ -248,9 +259,15 @@ const TransactionTable = () => {
               <FaEdit />
             </button>
             <button
-              onClick={() => handleTransactionDelete(row.original._id)}
+              onClick={() => {
+                setModalDetail(() => ({
+                  modalId: "delete",
+                  transactionId: String(row.original._id),
+                }));
+                dispatch(handleOpenAndCloseModal());
+              }}
               title="Delete"
-              className={`p-2 border rounded-full transition-colors hover:text-red-600 ${
+              className={`p-2 border rounded-full transition-colors hover:text-red-600  cursor-pointer ${
                 theme === "dark"
                   ? "border-gray-600 text-gray-300 hover:border-red-400"
                   : "border-gray-300 text-gray-600"
@@ -287,7 +304,17 @@ const TransactionTable = () => {
       <div className="flex items-center justify-between mb-4">
         <div className="lg:flex items-center gap-4">
           <h2 className="text-xl font-semibold ">Transactions</h2>
-          <Button className="lg:flex hidden items-center gap-2">
+          <Button
+            className="lg:flex hidden items-center gap-2"
+            onClick={() => {
+              setModalDetail((pre) => ({
+                ...pre,
+                modalId: "add",
+                transactionId: "",
+              }));
+              dispatch(handleOpenAndCloseModal());
+            }}
+          >
             <FaPlus /> Add Transaction
           </Button>
         </div>
@@ -496,9 +523,9 @@ const TransactionTable = () => {
                 }))
               }
               disabled={pagination.page === 1}
-              className={`px-3 py-1 border rounded ${
+              className={`px-3 py-1 border rounded cursor-pointer ${
                 pagination.page === 1
-                  ? "opacity-50 cursor-not-allowed"
+                  ? "opacity-50 !cursor-not-allowed"
                   : theme === "dark"
                   ? "text-white border-gray-600"
                   : "text-black border-gray-300"
@@ -515,9 +542,9 @@ const TransactionTable = () => {
                 }))
               }
               disabled={pagination.page === pagination.totalPages}
-              className={`px-3 py-1 border rounded ${
+              className={`px-3 py-1 border rounded cursor-pointer ${
                 pagination.page === pagination.totalPages
-                  ? "opacity-50 cursor-not-allowed"
+                  ? "opacity-50 !cursor-not-allowed"
                   : theme === "dark"
                   ? "text-white border-gray-600"
                   : "text-black border-gray-300"
@@ -569,7 +596,12 @@ const TransactionTable = () => {
           Next
         </button>
       </div>
-      <Modal />
+      {isOpen && (
+        <Modal
+          id={modalDetail.modalId}
+          transactionId={modalDetail.transactionId}
+        />
+      )}
     </div>
   );
 };
