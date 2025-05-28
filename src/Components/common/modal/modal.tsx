@@ -20,7 +20,13 @@ import {
 } from "@/util/api/apis/transaction";
 
 const transactionType = ["Select Transaction Type", "Income", "Expense"];
-const categories = ["Food", "Rent", "Entertainment", "Salary"];
+export const categories = [
+  "Food",
+  "Rent",
+  "Entertainment",
+  "Salary",
+  "Healthcare",
+];
 
 const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
   const dispatch = useDispatch();
@@ -44,7 +50,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
     getValues,
     reset,
     register,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm({
     defaultValues: {
       amount: id === "edit" ? editDetail.amount : 0,
@@ -106,6 +112,8 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
   const handleEditTransaction = async () => {
     try {
       const data = getValues();
+      data.type.toLowerCase();
+      data.category.toLowerCase();
       await handleUpdateTransaction(transactionId, data);
       dispatch(handleRefetch());
       dispatch(handleOpenAndCloseModal());
@@ -116,13 +124,13 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
 
   const handleCancel = () => {
     reset();
-    dispatch(handleRefetch());
     dispatch(handleOpenAndCloseModal());
   };
 
   const handleDeleteTransaction = async () => {
     try {
       const result: any = await handleDeleteTransactions(transactionId);
+      dispatch(handleRefetch());
       dispatch(handleOpenAndCloseModal());
       console.log(result);
     } catch (err: any) {
@@ -436,7 +444,10 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
               </button>
               <button
                 type="submit"
-                className="bg-blue-600 text-white px-4 py-2 rounded-md cursor-pointer"
+                className={`bg-blue-600 text-white px-4 py-2 rounded-md ${
+                  !isDirty ? "cursor-not-allowed" : "cursor-pointer"
+                }`}
+                disabled={!isDirty}
               >
                 Submit
               </button>
@@ -508,7 +519,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
             theme === "dark"
               ? "bg-[#27282E] border border-[#1B1C21]"
               : "bg-white text-black"
-          } px-4 py-6 rounded-md shadow-xl md:max-w-[500px] md:h-auto h-screen my-5 w-full relative`}
+          } px-4 py-6 rounded-md shadow-xl md:max-w-[500px] h-auto  my-5 w-full relative`}
         >
           {modalContent}
           <div

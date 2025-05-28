@@ -46,7 +46,6 @@ export async function handleDeleteTransactions(id: string) {
 
 export async function handleAddNewTransaction(body: any) {
   try {
-    console.log(body);
     const res = await axiosInstance.post(
       `${transactionEndpoint.newTransaction}`,
       body

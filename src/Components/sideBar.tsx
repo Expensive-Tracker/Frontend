@@ -18,18 +18,15 @@ const SideBar = () => {
   const uiData = useSelector((state: RootState) => state.uiSlice.sidebar);
   const pathname = usePathname();
   const dispatch = useDispatch();
-
   const handleMouseEnter = () => {
     dispatch(handleHoverIn());
   };
   const handleShowMenu = () => {
     dispatch(handleOpenAndClose());
   };
-
   const handleMouseLeave = () => {
     dispatch(handleHoverOut());
   };
-
   const sidebarWidth =
     uiData.isOpen || uiData.isHovered ? "w-[220px]" : "w-[60px]";
 
@@ -41,21 +38,31 @@ const SideBar = () => {
         className={`fixed ${sidebarWidth} z-50 left-0 top-0 h-full border-r border-collapse lg:block hidden border-r-[#27282E] transition-all`}
       >
         {/* sidebar header */}
-        <div className="px-6 py-1.5 pb-2.5 flex items-start  flex-col gap-0 relative">
-          <div className="flex items-center gap-2">
+        <div
+          className={`px-6 py-1.5 pb-2.5 ${
+            uiData.isOpen || uiData.isHovered ? "" : " mt-4 pl-4.5"
+          }  flex items-start  flex-col gap-0 relative`}
+        >
+          <div className={`flex items-center gap-2 `}>
             <BiWalletAlt size={25} />
-            <div>
-              <Text Element="h2" text="Expense" style="font-bold" />
-              <Text
-                Element="p"
-                text="Tracker"
-                style="font-light -mt-1.5"
-                isDes
-              />
-            </div>
+            {uiData.isOpen || uiData.isHovered ? (
+              <div>
+                <Text Element="h2" text="Expense" style="font-bold" />
+                <Text
+                  Element="p"
+                  text="Tracker"
+                  style="font-light -mt-1.5"
+                  isDes
+                />
+              </div>
+            ) : (
+              <></>
+            )}
           </div>
           <div
-            className={`absolute  top-4 hidden -right-4 lg:block cursor-pointer z-50 transition-all p-2 shadow rounded-full ${
+            className={`absolute  ${
+              uiData.isOpen || uiData.isHovered ? "top-[12px]" : "top-0"
+            } hidden -right-6 lg:block cursor-pointer z-50 transition-all p-2 shadow rounded-full ${
               uiData.isOpen ? "rotate-0" : "rotate-180"
             } ${theme === "dark" ? "bg-[#27282E]" : "bg-white"} `}
             onClick={handleShowMenu}
@@ -75,12 +82,12 @@ const SideBar = () => {
         </div>
         {/* sideBar body */}
         <div className={`px-3 py-4 h-full overflow-y-hidden`}>
-          <ul className="flex items-start gap-5 flex-col">
+          <ul className="flex items-start gap-2.5 flex-col">
             {navItem.map((item: navItemInterface) => {
               const isExpanded = uiData.isOpen || uiData.isHovered;
               const isActive = pathname === item.path;
 
-              const commonClasses = `flex items-center gap-2 text-base ${
+              const commonClasses = `flex items-center gap-2 text-base focus:outline-none ${
                 isExpanded ? "py-3 px-3" : "py-3 px-2"
               } rounded-md transition-all cursor-pointer w-full ${
                 isActive
@@ -116,17 +123,21 @@ const SideBar = () => {
       </div>
       {/* mobile */}
       <div
-        className={`lg:hidden absolute grid grid-cols-2 items-start h-screen w-screen z-[1000] -top-1.5  transition-all ${
+        className={`lg:hidden absolute grid grid-cols-[200px_auto] items-start h-screen w-screen z-[1000] -top-1.5  transition-all ${
           uiData.mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className=" h-full bg-white shadow z-[100]">
+        <div
+          className={`h-full shadow z-[100] ${
+            theme === "dark" ? "bg-[#1B1C21]" : "bg-white"
+          }`}
+        >
           <div className="px-3 py-4 h-full">
             <ul className="flex items-start gap-5 flex-col">
               {navItem.map((item: navItemInterface) => (
                 <li
                   key={item.id}
-                  className={`flex items-center gap-2 text-base py-3 px-3 rounded-md transition-all cursor-pointer w-full ${
+                  className={`flex items-center gap-2 text-base py-3 px-3 rounded-md transition-all cursor-pointer w-full focus:outline-none ${
                     theme === "dark"
                       ? "hover:text-white hover:bg-[#27282E] hover:shadow hover:shadow-[#27282E]"
                       : "hover:bg-black hover:text-white hover:shadow hover:shadow-[#27282E]"

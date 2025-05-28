@@ -91,18 +91,18 @@ function Header() {
             {userData?.profilePic ? (
               <Image
                 src={userData?.profilePic}
-                className="object-cover rounded-4xl w-10 h-10"
+                className="object-cover rounded-4xl w-8 h-8"
                 alt="Avatar"
               />
             ) : (
-              <RxAvatar size={24} />
+              <RxAvatar className="w-8 h-8" />
             )}
 
             <span className="hidden md:inline">{userData.username}</span>
             <IoIosArrowDown />
           </div>
           <div
-            className={`absolute left-[-48px] top-[37px] z-10 w-[150px] rounded-b-md shadow-2xl px-8 py-3 flex flex-col items-start
+            className={`absolute md:left-0 left-[-80px] top-[42px] md:top-[37px] z-10 w-[150px] rounded-b-md shadow-2xl px-8 py-3 flex flex-col items-start
               transition-all duration-300 ease-in-out transform origin-top ${
                 userMenuOpen
                   ? "opacity-100 scale-100"

@@ -7,5 +7,5 @@ export default function Home() {
   if (!authToken) {
     redirect("/auth/signin");
   }
-  return <>hello</>;
+  return <div className="p-4 py-6">hello</div>;
 }
