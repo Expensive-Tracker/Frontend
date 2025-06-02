@@ -538,142 +538,152 @@ const TransactionTable = () => {
           </table>
         )}
       </div>
-      <div className="md:flex hidden items-baseline justify-between mt-4 px-2 flex-wrap gap-4">
-        <span className="text-sm">
-          Page {pagination.page} of {pagination.totalPages}
-        </span>
+      {!loading && (data?.length ?? 0) <= 0 ? (
+        <></>
+      ) : (
+        <>
+          <div className="md:flex hidden items-baseline justify-between mt-4 px-2 flex-wrap gap-4">
+            <span className="text-sm">
+              Page {pagination.page} of {pagination.totalPages}
+            </span>
 
-        <div className="flex items-baseline gap-4">
-          <div className="flex items-center gap-2">
-            <label
-              htmlFor="rows-per-page"
-              className="text-sm whitespace-nowrap"
-            >
-              Rows per page:
-            </label>
-            <select
-              id="rows-per-page"
-              value={pagination.limit}
-              onChange={handleChangeRowsPerPage}
-              className={`border px-2 py-1 rounded text-sm ${
-                theme === "dark"
-                  ? "bg-[#2A2B30] text-white border-gray-600"
-                  : "bg-white text-black border-gray-300"
-              }`}
-            >
-              {[5, 10, 20, 50].map((value) => (
-                <option key={value} value={value}>
-                  {value}
-                </option>
-              ))}
-            </select>
+            <div className="flex items-baseline gap-4">
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="rows-per-page"
+                  className="text-sm whitespace-nowrap"
+                >
+                  Rows per page:
+                </label>
+                <select
+                  id="rows-per-page"
+                  value={pagination.limit}
+                  onChange={handleChangeRowsPerPage}
+                  className={`border px-2 py-1 rounded text-sm ${
+                    theme === "dark"
+                      ? "bg-[#2A2B30] text-white border-gray-600"
+                      : "bg-white text-black border-gray-300"
+                  }`}
+                >
+                  {[5, 10, 20, 50].map((value) => (
+                    <option key={value} value={value}>
+                      {value}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex  gap-2 sm:mt-4 ">
+                <button
+                  onClick={() =>
+                    setPagination((prev) => ({
+                      ...prev,
+                      page: Math.max(prev.page - 1, 1),
+                    }))
+                  }
+                  disabled={pagination.page === 1}
+                  className={`px-3 py-1 border rounded cursor-pointer ${
+                    pagination.page === 1
+                      ? "opacity-50 !cursor-not-allowed"
+                      : theme === "dark"
+                      ? "text-white border-gray-600"
+                      : "text-black border-gray-300"
+                  }`}
+                >
+                  Previous
+                </button>
+
+                <button
+                  onClick={() =>
+                    setPagination((prev) => ({
+                      ...prev,
+                      page: Math.min(prev.page + 1, prev.totalPages),
+                    }))
+                  }
+                  disabled={pagination.page === pagination.totalPages}
+                  className={`px-3 py-1 border rounded cursor-pointer ${
+                    pagination.page === pagination.totalPages
+                      ? "opacity-50 !cursor-not-allowed"
+                      : theme === "dark"
+                      ? "text-white border-gray-600"
+                      : "text-black border-gray-300"
+                  }`}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
           </div>
-
-          <div className="flex  gap-2 sm:mt-4 ">
-            <button
-              onClick={() =>
-                setPagination((prev) => ({
-                  ...prev,
-                  page: Math.max(prev.page - 1, 1),
-                }))
-              }
-              disabled={pagination.page === 1}
-              className={`px-3 py-1 border rounded cursor-pointer ${
-                pagination.page === 1
-                  ? "opacity-50 !cursor-not-allowed"
-                  : theme === "dark"
-                  ? "text-white border-gray-600"
-                  : "text-black border-gray-300"
-              }`}
-            >
-              Previous
-            </button>
-
-            <button
-              onClick={() =>
-                setPagination((prev) => ({
-                  ...prev,
-                  page: Math.min(prev.page + 1, prev.totalPages),
-                }))
-              }
-              disabled={pagination.page === pagination.totalPages}
-              className={`px-3 py-1 border rounded cursor-pointer ${
-                pagination.page === pagination.totalPages
-                  ? "opacity-50 !cursor-not-allowed"
-                  : theme === "dark"
-                  ? "text-white border-gray-600"
-                  : "text-black border-gray-300"
-              }`}
-            >
-              Next
-            </button>
+          <div className=" md:hidden flex flex-col gap-4 items-center">
+            <div className=" mt-4 flex items-center w-full justify-between">
+              <button
+                onClick={() =>
+                  setPagination((prev) => ({
+                    ...prev,
+                    page: Math.max(prev.page - 1, 1),
+                  }))
+                }
+                disabled={pagination.page === 1}
+                className={`px-3 py-1 border rounded ${
+                  pagination.page === 1
+                    ? "opacity-50 cursor-not-allowed"
+                    : theme === "dark"
+                    ? "text-white border-gray-600"
+                    : "text-black border-gray-300"
+                }`}
+              >
+                Previous
+              </button>
+              <span className="text-sm">
+                Page {pagination.page} of {pagination.totalPages}
+              </span>
+              <button
+                onClick={() =>
+                  setPagination((prev) => ({
+                    ...prev,
+                    page: Math.min(prev.page + 1, prev.totalPages),
+                  }))
+                }
+                disabled={pagination.page === pagination.totalPages}
+                className={`px-3 py-1 border rounded ${
+                  pagination.page === pagination.totalPages
+                    ? "opacity-50 cursor-not-allowed"
+                    : theme === "dark"
+                    ? "text-white border-gray-600"
+                    : "text-black border-gray-300"
+                }`}
+              >
+                Next
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
+              <label
+                htmlFor="rows-per-page"
+                className="text-sm whitespace-nowrap"
+              >
+                Rows per page:
+              </label>
+              <select
+                id="rows-per-page"
+                value={pagination.limit}
+                onChange={handleChangeRowsPerPage}
+                className={`border px-2 py-1 rounded text-sm ${
+                  theme === "dark"
+                    ? "bg-[#2A2B30] text-white border-gray-600"
+                    : "bg-white text-black border-gray-300"
+                }`}
+              >
+                {[5, 10, 20, 50].map((value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-        </div>
-      </div>
-      <div className=" md:hidden flex flex-col gap-4 items-center">
-        <div className=" mt-4 flex items-center w-full justify-between">
-          <button
-            onClick={() =>
-              setPagination((prev) => ({
-                ...prev,
-                page: Math.max(prev.page - 1, 1),
-              }))
-            }
-            disabled={pagination.page === 1}
-            className={`px-3 py-1 border rounded ${
-              pagination.page === 1
-                ? "opacity-50 cursor-not-allowed"
-                : theme === "dark"
-                ? "text-white border-gray-600"
-                : "text-black border-gray-300"
-            }`}
-          >
-            Previous
-          </button>
-          <span className="text-sm">
-            Page {pagination.page} of {pagination.totalPages}
-          </span>
-          <button
-            onClick={() =>
-              setPagination((prev) => ({
-                ...prev,
-                page: Math.min(prev.page + 1, prev.totalPages),
-              }))
-            }
-            disabled={pagination.page === pagination.totalPages}
-            className={`px-3 py-1 border rounded ${
-              pagination.page === pagination.totalPages
-                ? "opacity-50 cursor-not-allowed"
-                : theme === "dark"
-                ? "text-white border-gray-600"
-                : "text-black border-gray-300"
-            }`}
-          >
-            Next
-          </button>
-        </div>
-        <div className="flex items-center gap-2">
-          <label htmlFor="rows-per-page" className="text-sm whitespace-nowrap">
-            Rows per page:
-          </label>
-          <select
-            id="rows-per-page"
-            value={pagination.limit}
-            onChange={handleChangeRowsPerPage}
-            className={`border px-2 py-1 rounded text-sm ${
-              theme === "dark"
-                ? "bg-[#2A2B30] text-white border-gray-600"
-                : "bg-white text-black border-gray-300"
-            }`}
-          >
-            {[5, 10, 20, 50].map((value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+        </>
+      )}
+
       {isOpen && (
         <Modal
           id={modalDetail.modalId}

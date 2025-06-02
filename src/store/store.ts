@@ -5,11 +5,13 @@ import { persistReducer } from "redux-persist";
 import { persistStore } from "redux-persist";
 import themeSliceReduce from "./slice/themeSlice";
 import uiSliceReducer from "./slice/uiSlice";
+import budgetSliceReducer from "./slice/budgetSlice";
 
 const rootReducer = combineReducers({
   user: userSliceReducer,
   theme: themeSliceReduce,
   uiSlice: uiSliceReducer,
+  budget: budgetSliceReducer,
 });
 
 const key = "user Data";

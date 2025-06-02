@@ -8,12 +8,16 @@ const initialState: userSliceState = {
     _id: "",
   },
   token: "",
+  isNew: true,
 };
 
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
+    handleIsUserNew: (state) => {
+      state.isNew = !state.isNew;
+    },
     handleSignIn: (
       state,
       action: PayloadAction<userSliceState["userDetail"]>
@@ -47,6 +51,7 @@ export const {
   handleChangeUserData,
   handleHydrateToken,
   handleUserSignOut,
+  handleIsUserNew,
 } = userSlice.actions;
 const userSliceReducer = userSlice.reducer;
 

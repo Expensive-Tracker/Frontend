@@ -8,14 +8,19 @@ import { register as registerType } from "@/util/interface/auth";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { registerValidationSchema } from "@/util/validation/authValidaion";
 import InputAndLabel from "@/components/common/input/inputAndLabel";
-import { redirect, useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import { RxAvatar } from "react-icons/rx";
 import { useDispatch } from "react-redux";
 import { handleRegister } from "@/util/api/apis/userApi";
-import { handleSignIn, handleHydrateToken } from "@/store/slice/userSlice";
+import {
+  handleSignIn,
+  handleHydrateToken,
+  handleIsUserNew,
+} from "@/store/slice/userSlice";
+import { handleShowSplashScreen } from "@/store/slice/uiSlice";
+import Image from "next/image";
 
 function Register() {
-  const router = useRouter();
   const dispatch = useDispatch();
   const [err, setErr] = useState({ showErr: false, errMsg: "" });
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -84,8 +89,12 @@ function Register() {
           const token = response.data.token;
           dispatch(handleSignIn(user));
           dispatch(handleHydrateToken(token));
+          dispatch(handleShowSplashScreen());
+          dispatch(handleIsUserNew());
           localStorage.setItem("authToken", token);
-          router.push("/");
+          setTimeout(() => {
+            redirect("/");
+          }, 1000);
         } else {
           setErr({ showErr: true, errMsg: response });
         }
@@ -120,7 +129,7 @@ function Register() {
         onClick={handleIconClick}
       >
         {image ? (
-          <img
+          <Image
             src={image}
             alt="Uploaded"
             className="w-full h-full object-cover"

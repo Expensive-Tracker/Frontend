@@ -23,8 +23,8 @@ export const loginValidationSchema = object({
 export const registerValidationSchema = object({
   username: string()
     .required("Username is required")
-    .matches(/[A-Z]/, "Username must contain at least one uppercase letter")
-    .matches(/[0-9]/, "Username must contain at least one numeric value"),
+    .matches(/[A-Z]/, "Username must contain at least one uppercase letter"),
+  // .matches(/[0-9]/, "Username must contain at least one numeric value"),
   email: string().required("email is required").email("enter correct email"),
   password: string()
     .required("password is required")

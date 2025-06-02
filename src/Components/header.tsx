@@ -8,7 +8,7 @@ import { useState, useEffect, useRef } from "react";
 import { CiLogout } from "react-icons/ci";
 import { MdOutlineWbSunny } from "react-icons/md";
 import { handleUserSignOut } from "@/store/slice/userSlice";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import { HiOutlineMenuAlt1 } from "react-icons/hi";
 import { handleMobileMenuOpen } from "@/store/slice/uiSlice";
 import Image from "next/image";
@@ -19,7 +19,6 @@ function Header() {
   const userData = useSelector((state: RootState) => state.user.userDetail);
   const theme = useSelector((state: RootState) => state.theme.theme);
   const dispatch = useDispatch();
-  const router = useRouter();
 
   function handleShowUserMenu() {
     setUserMenuOpen((pre) => !pre);
@@ -35,9 +34,7 @@ function Header() {
     localStorage.removeItem("OtpToken");
     localStorage.removeItem("email");
     localStorage.removeItem("correctOtpToken");
-    setTimeout(() => {
-      router.push("/auth/signin");
-    }, 3000);
+    redirect("/auth/signin");
   }
 
   useEffect(() => {

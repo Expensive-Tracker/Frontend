@@ -9,7 +9,8 @@ import Header from "./header";
 import { MdOutlineWbSunny } from "react-icons/md";
 import { handleThemeChange } from "@/store/slice/themeSlice";
 import SideBar from "./sideBar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import SplashScreen from "./splashScreen";
 
 export default function ClientWrapper({
   children,
@@ -18,11 +19,22 @@ export default function ClientWrapper({
 }) {
   const authToken = useSelector((state: RootState) => state.user.token);
   const theme = useSelector((state: RootState) => state.theme.theme);
+  const [, forUpdate] = useState<number>(0);
   const uiSideBar = useSelector((state: RootState) => state.uiSlice.sidebar);
+  const splashScreen = useSelector(
+    (state: RootState) => state.uiSlice.splashScreen
+  );
+  const splashFlag = useSelector(
+    (state: RootState) => state.uiSlice.splashFlag
+  );
   const dispatch = useDispatch();
   function handleChangeTheme() {
     dispatch(handleThemeChange());
   }
+
+  useEffect(() => {
+    forUpdate((n) => n + 1);
+  }, [splashFlag]);
 
   useEffect(() => {
     function colorBodyChange() {
@@ -47,21 +59,27 @@ export default function ClientWrapper({
   return (
     <div className={`h-full  transition-all `}>
       {authToken !== "" || window.location.href.includes("imageUpload") ? (
-        <div className="relative">
-          {!window.location.href.includes("imageUpload") && <Header />}
-          {!window.location.href.includes("imageUpload") && <SideBar />}
-          <div
-            className={`mt-[65px] max-w-[1920px] mx-auto
+        splashScreen ? (
+          <div className="h-screen flex items-center justify-center">
+            <SplashScreen />
+          </div>
+        ) : (
+          <div className="relative">
+            {!window.location.href.includes("imageUpload") && <Header />}
+            {!window.location.href.includes("imageUpload") && <SideBar />}
+            <div
+              className={`mt-[65px] max-w-[1920px] mx-auto
               ${
                 uiSideBar.isOpen || uiSideBar.isHovered
                   ? "lg:pl-[220px]"
                   : "lg:pl-[60px]"
               }
               `}
-          >
-            {children}
+            >
+              {children}
+            </div>
           </div>
-        </div>
+        )
       ) : (
         <div className="grid grid-cols-1 relative items-center justify-center lg:grid-cols-2 h-full ">
           <div

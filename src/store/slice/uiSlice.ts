@@ -7,6 +7,8 @@ const initialState: uiSliceState = {
     isOpen: true,
     mobileOpen: false,
   },
+  splashScreen: false,
+  splashFlag: false,
   refetch: false,
   modal: {
     isOpen: false,
@@ -17,6 +19,13 @@ const uiSlice = createSlice({
   initialState,
   name: "uiSlice",
   reducers: {
+    handleShowSplashScreen: (state) => {
+      state.splashScreen = !state.splashScreen;
+      console.log(state.splashScreen);
+    },
+    handleChangeSplashFlag: (state) => {
+      state.splashFlag = !state.splashFlag;
+    },
     handleOpenAndClose: (state) => {
       state.sidebar.isOpen = !state.sidebar.isOpen;
     },
@@ -45,6 +54,8 @@ export const {
   handleMobileMenuOpen,
   handleRefetch,
   handleOpenAndCloseModal,
+  handleShowSplashScreen,
+  handleChangeSplashFlag,
 } = uiSlice.actions;
 
 const uiSliceReducer = uiSlice.reducer;

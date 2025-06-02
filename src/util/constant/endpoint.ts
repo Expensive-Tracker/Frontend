@@ -16,6 +16,16 @@ const endpoints = {
     deleteTransition: "/transactions/:id",
     totalExpense: "/transactions/summary",
   },
+  budgets: {
+    monthlyBudgets: "/budgets/:month",
+    allBudgets: "/budgets",
+    subBudgetCreate: "/budgets/subBudget",
+    specificBudgets: "/budgets/:id",
+    updBudgets: "/budgets/:id",
+    updSubBudgets: "/budgets/subBudget/:id",
+    DeleteBudgets: "/budgets/:id",
+    subDeleteBudgets: "/budgets/subBudget/:id",
+  },
 };
 
 export default endpoints;

@@ -11,6 +11,10 @@ import InputAndLabel from "@/components/common/input/inputAndLabel";
 import { useDispatch } from "react-redux";
 import { handleHydrateToken, handleSignIn } from "@/store/slice/userSlice";
 import { redirect } from "next/navigation";
+import {
+  handleChangeSplashFlag,
+  handleShowSplashScreen,
+} from "@/store/slice/uiSlice";
 
 function Login() {
   const dispatch = useDispatch();
@@ -46,7 +50,11 @@ function Login() {
       dispatch(handleSignIn(respond.response.detail));
       localStorage.setItem("authToken", respond.response.token);
       dispatch(handleHydrateToken(respond.response.token));
-      redirect("/");
+      dispatch(handleChangeSplashFlag());
+      dispatch(handleShowSplashScreen());
+      setTimeout(() => {
+        redirect("/");
+      }, 1000);
     } else {
       setErr(() => ({ errMsg: respond, showErr: true }));
     }
