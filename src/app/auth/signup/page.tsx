@@ -18,7 +18,6 @@ import {
   handleIsUserNew,
 } from "@/store/slice/userSlice";
 import { handleShowSplashScreen } from "@/store/slice/uiSlice";
-import Image from "next/image";
 
 function Register() {
   const dispatch = useDispatch();
@@ -129,7 +128,7 @@ function Register() {
         onClick={handleIconClick}
       >
         {image ? (
-          <Image
+          <img
             src={image}
             alt="Uploaded"
             className="w-full h-full object-cover"

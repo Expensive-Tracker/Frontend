@@ -8,7 +8,7 @@ import {
   handleChangeSplashFlag,
   handleShowSplashScreen,
 } from "@/store/slice/uiSlice";
-// import { handleIsUserNew } from "@/store/slice/userSlice";
+import {} from "@/store/slice/userSlice";
 import { useEffect } from "react";
 
 const SplashScreen = () => {
@@ -18,7 +18,6 @@ const SplashScreen = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       dispatch(handleChangeSplashFlag());
-      // dispatch(handleIsUserNew());
       dispatch(handleShowSplashScreen());
     }, 4000);
     return () => clearTimeout(timer);

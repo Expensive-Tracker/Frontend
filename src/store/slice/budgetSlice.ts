@@ -6,6 +6,8 @@ const initialState: Budget = {
   month: "",
   category: [],
   _id: "",
+  totalRemain: 0,
+  totalSpent: 0,
 };
 
 const budgetSlice = createSlice({

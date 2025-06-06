@@ -10,7 +10,13 @@ export interface userSliceState {
     confirmPassword?: string;
   };
   token: string;
-  isNew: boolean;
+  isNew: {
+    new: boolean;
+    remain: {
+      budgets?: boolean;
+      transaction?: boolean;
+    };
+  };
 }
 
 export interface themeSliceState {
@@ -40,6 +46,7 @@ export interface SubBudget {
   categoryName: string;
   subBudgetAmount: number;
   budgetTransaction: BudgetTransaction;
+  spentPercentage?: number | string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -49,6 +56,8 @@ export interface Budget {
   budgetAmount: number;
   category?: SubBudget[];
   month: string;
+  totalSpent?: number | string;
+  totalRemain?: number | string;
   createdAt?: string;
   updatedAt?: string;
 }

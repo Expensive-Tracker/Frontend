@@ -134,19 +134,41 @@ const SideBar = () => {
         >
           <div className="px-3 py-4 h-full">
             <ul className="flex items-start gap-5 flex-col">
-              {navItem.map((item: navItemInterface) => (
-                <li
-                  key={item.id}
-                  className={`flex items-center gap-2 text-base py-3 px-3 rounded-md transition-all cursor-pointer w-full focus:outline-none ${
-                    theme === "dark"
-                      ? "hover:text-white hover:bg-[#27282E] hover:shadow hover:shadow-[#27282E]"
-                      : "hover:bg-black hover:text-white hover:shadow hover:shadow-[#27282E]"
-                  }`}
-                >
-                  <span className="!text-xl">{item.icon}</span>
-                  <Link href={item.path}>{item.navName}</Link>
-                </li>
-              ))}
+              {navItem.map((item: navItemInterface) => {
+                const isExpanded = uiData.isOpen || uiData.isHovered;
+                const isActive = pathname === item.path;
+
+                const commonClasses = `flex items-center gap-2 text-base focus:outline-none ${
+                  isExpanded ? "py-3 px-3" : "py-3 px-2"
+                } rounded-md transition-all cursor-pointer w-full ${
+                  isActive
+                    ? theme === "dark"
+                      ? "text-white bg-[#27282E] shadow shadow-[#27282E]"
+                      : "bg-black text-white shadow shadow-[#27282E]"
+                    : theme === "dark"
+                    ? "hover:text-white hover:bg-[#27282E] hover:shadow hover:shadow-[#27282E]"
+                    : "hover:bg-black hover:text-white hover:shadow hover:shadow-[#27282E]"
+                }`;
+
+                if (isExpanded) {
+                  return (
+                    <li key={item.id} className={commonClasses}>
+                      <span className="!text-xl">{item.icon}</span>
+                      <Link href={item.path}>{item.navName}</Link>
+                    </li>
+                  );
+                } else {
+                  return (
+                    <Link
+                      key={item.id}
+                      href={item.path}
+                      className={commonClasses}
+                    >
+                      <span className="!text-xl">{item.icon}</span>
+                    </Link>
+                  );
+                }
+              })}
             </ul>
           </div>
         </div>

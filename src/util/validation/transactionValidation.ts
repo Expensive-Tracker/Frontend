@@ -1,7 +1,7 @@
 import { boolean, number, object, string } from "yup";
 
 export const transactionSchema = object().shape({
-  _id: string(),
+  _id: string().optional(),
   type: string()
     // .oneOf(["income", "expense"], "Transaction type must be Income or Expense")
     .notOneOf(["Select Transaction Type"], "Transaction Type is required")

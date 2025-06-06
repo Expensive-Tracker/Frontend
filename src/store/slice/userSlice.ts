@@ -8,7 +8,13 @@ const initialState: userSliceState = {
     _id: "",
   },
   token: "",
-  isNew: true,
+  isNew: {
+    new: false,
+    remain: {
+      budgets: false,
+      transaction: false,
+    },
+  },
 };
 
 const userSlice = createSlice({
@@ -16,7 +22,26 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     handleIsUserNew: (state) => {
-      state.isNew = !state.isNew;
+      state.isNew.new = true;
+      state.isNew.remain.budgets = true;
+      state.isNew.remain.transaction = true;
+    },
+    handleSetNewFalse: (state) => {
+      state.isNew.new = false;
+      state.isNew.remain.budgets = false;
+      state.isNew.remain.transaction = false;
+    },
+    handleSetRemainTrue: (
+      state,
+      action: PayloadAction<keyof userSliceState["isNew"]["remain"]>
+    ) => {
+      state.isNew.remain[action.payload] = true;
+    },
+    handleSetRemainFalse: (
+      state,
+      action: PayloadAction<keyof userSliceState["isNew"]["remain"]>
+    ) => {
+      state.isNew.remain[action.payload] = false;
     },
     handleSignIn: (
       state,
@@ -52,6 +77,9 @@ export const {
   handleHydrateToken,
   handleUserSignOut,
   handleIsUserNew,
+  handleSetRemainTrue,
+  handleSetRemainFalse,
+  handleSetNewFalse,
 } = userSlice.actions;
 const userSliceReducer = userSlice.reducer;
 

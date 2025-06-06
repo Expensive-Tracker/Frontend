@@ -143,7 +143,6 @@ const TransactionTable = () => {
       header: "Date",
       accessorKey: "date",
       enableSorting: true,
-
       cell: ({ getValue }) => {
         const date = getValue() as string;
         return (
@@ -175,7 +174,6 @@ const TransactionTable = () => {
       header: "Category",
       accessorKey: "category",
       enableSorting: false,
-
       cell: ({ getValue }) => {
         return (
           <span
@@ -190,7 +188,6 @@ const TransactionTable = () => {
       header: "Description",
       accessorKey: "description",
       enableSorting: false,
-
       cell: ({ getValue }) => {
         const desc = getValue() as string;
         return (
@@ -208,7 +205,6 @@ const TransactionTable = () => {
       header: "Type",
       accessorKey: "type",
       enableSorting: false,
-
       cell: ({ getValue }) => {
         const value = (getValue() as string).toLowerCase();
         return (
@@ -220,9 +216,8 @@ const TransactionTable = () => {
     },
     {
       header: "Recurring",
-      accessorKey: "isRecurring",
+      accessorKey: "recurring",
       enableSorting: false,
-
       cell: ({ getValue }) => {
         const isRecurring = getValue() as boolean;
         return (

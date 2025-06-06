@@ -18,6 +18,12 @@ import {
   handleGetSpecificTransaction,
   handleUpdateTransaction,
 } from "@/util/api/apis/transaction";
+import { budgetSchemaMain } from "@/util/validation/budgetValidation";
+import {
+  getSpecificSubBudget,
+  handleCreateSubBudget,
+  handleEditSubBudget,
+} from "@/util/api/apis/budgets";
 
 const transactionType = ["Select Transaction Type", "Income", "Expense"];
 export const categories = [
@@ -33,6 +39,8 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
   const userDetail = useSelector(
     (state: RootState) => state.user.userDetail._id
   );
+  const budgetId = useSelector((state: RootState) => state.budget._id ?? "");
+
   const [editDetail, setEditDetail] = useState({
     amount: 0,
     category: "",
@@ -44,13 +52,14 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
 
   const theme = useSelector((state: RootState) => state.theme.theme);
   let modalContent;
+  const isSubBudget = id.includes("subBudget");
 
   const {
-    handleSubmit,
-    getValues,
-    reset,
-    register,
-    formState: { errors, isDirty },
+    handleSubmit: handleTransactionSubmit,
+    getValues: getTransactionValue,
+    reset: resetTransaction,
+    register: transactionRegister,
+    formState: { errors: transactionError, isDirty: transactionIsDirty },
   } = useForm({
     defaultValues: {
       amount: id === "edit" ? editDetail.amount : 0,
@@ -66,14 +75,47 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
     resolver: yupResolver(transactionSchema),
   });
 
+  const {
+    handleSubmit,
+    register,
+    reset,
+    getValues,
+    formState: { errors, isDirty },
+  } = useForm({
+    defaultValues: {
+      budget: undefined,
+      category: "",
+    },
+    resolver: yupResolver(budgetSchemaMain),
+  });
+
   function handleModalClose() {
     dispatch(handleOpenAndCloseModal());
   }
 
   useEffect(() => {
-    reset();
-    if (transactionId) getTransactionDetail();
+    resetTransaction();
+    if (transactionId) {
+      if (isSubBudget) {
+        handleGetSpecificSubBudget();
+      } else {
+        getTransactionDetail();
+      }
+    }
   }, [transactionId]);
+
+  async function handleGetSpecificSubBudget() {
+    try {
+      const result = await getSpecificSubBudget(budgetId, transactionId);
+      const budgetValue = result?.data.subBudgetAmount;
+      reset({
+        budget: budgetValue,
+        category: "",
+      });
+    } catch (err: any) {
+      console.error(err?.message);
+    }
+  }
 
   async function getTransactionDetail() {
     try {
@@ -91,7 +133,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
         recurring: result?.data?.isRecurring || false,
       };
       setEditDetail(data);
-      reset(data);
+      resetTransaction(data);
     } catch (err: any) {
       console.error(err?.message);
     }
@@ -99,7 +141,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
 
   const handleAddTransaction = async () => {
     try {
-      const data = getValues();
+      const data = getTransactionValue();
       data._id = userDetail;
       await handleAddNewTransaction(data);
       dispatch(handleRefetch());
@@ -109,9 +151,39 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
     }
   };
 
-  const handleEditTransaction = async () => {
+  async function handleBudgetSubmit() {
     try {
       const data = getValues();
+      const payload = {
+        id: budgetId,
+        categoryName: data.category,
+        subBudgetAmount: Number(data.budget),
+      };
+      await handleCreateSubBudget(payload);
+      dispatch(handleRefetch());
+      dispatch(handleOpenAndCloseModal());
+    } catch (err: any) {
+      console.error(err?.message);
+    }
+  }
+
+  async function handleBudgetEdit() {
+    try {
+      const data = getValues();
+      const payload = {
+        subBudgetAmount: Number(data.budget),
+      };
+      await handleEditSubBudget(budgetId, transactionId, payload);
+      dispatch(handleRefetch());
+      dispatch(handleOpenAndCloseModal());
+    } catch (err: any) {
+      console.error(err?.message);
+    }
+  }
+
+  const handleEditTransaction = async () => {
+    try {
+      const data = getTransactionValue();
       data.type.toLowerCase();
       data.category.toLowerCase();
       await handleUpdateTransaction(transactionId, data);
@@ -123,6 +195,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
   };
 
   const handleCancel = () => {
+    resetTransaction();
     reset();
     dispatch(handleOpenAndCloseModal());
   };
@@ -149,11 +222,11 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
           />
           <form
             className="mt-6 space-y-3"
-            onSubmit={handleSubmit(handleAddTransaction)}
+            onSubmit={handleTransactionSubmit(handleAddTransaction)}
           >
             <div className="relative w-full">
               <select
-                {...register("type")}
+                {...transactionRegister("type")}
                 className={`w-full p-2 pr-10 rounded-md focus:outline-none appearance-none transition-all peer ${
                   theme === "dark"
                     ? "bg-[#27282E] border border-white text-white"
@@ -170,9 +243,9 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
                 className="absolute right-3 top-[13px] pointer-events-none transition-transform duration-300 peer-focus:rotate-180"
                 size={16}
               />
-              {errors.type && (
+              {transactionError.type && (
                 <p className="text-red-400 text-base mt-1">
-                  {errors.type.message}
+                  {transactionError.type.message}
                 </p>
               )}
             </div>
@@ -181,7 +254,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
               type="number"
               labelText="Amount"
               placeHolder="Enter amount"
-              register={register}
+              register={transactionRegister}
               divStyle="!gap-1"
               inputStyle={` p-2  [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none
                 ${
@@ -190,12 +263,12 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
                     : "border border-black text-black"
                 }
                 `}
-              errorMessage={errors.amount?.message}
+              errorMessage={transactionError.amount?.message}
             />
             <div className="relative w-full">
               <label id="category">Category</label>
               <select
-                {...register("category")}
+                {...transactionRegister("category")}
                 className={`w-full mt-1 p-2 pr-10 rounded-md   focus:outline-none appearance-none transition-all peer ${
                   theme === "dark"
                     ? "bg-[#27282E] border border-white text-white"
@@ -213,9 +286,9 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
                 className="absolute right-3 top-[42px] pointer-events-none transition-transform duration-300 peer-focus:rotate-180"
                 size={16}
               />
-              {errors.category && (
+              {transactionError.category && (
                 <p className="text-red-400 text-base mt-1">
-                  {errors.category.message}
+                  {transactionError.category.message}
                 </p>
               )}
             </div>
@@ -223,34 +296,34 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
               name="date"
               type="date"
               labelText="Date"
-              register={register}
+              register={transactionRegister}
               divStyle="!gap-1"
               inputStyle={`p-2 ${
                 theme === "dark"
                   ? "bg-[#27282E] border border-white text-white"
                   : "border border-black text-black"
               }`}
-              errorMessage={errors.date?.message}
+              errorMessage={transactionError.date?.message}
             />
             <InputAndLabel
               name="description"
               type="text"
               labelText="Description (optional)"
               placeHolder="Add a note"
-              register={register}
+              register={transactionRegister}
               divStyle="!gap-1"
               inputStyle={`p-2 ${
                 theme === "dark"
                   ? "bg-[#27282E] border border-white text-white"
                   : "border border-black text-black"
               }`}
-              errorMessage={errors.description?.message}
+              errorMessage={transactionError.description?.message}
             />
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
                 id="recurring"
-                {...register("recurring")}
+                {...transactionRegister("recurring")}
                 className="w-4 h-4"
               />
               <label htmlFor="recurring" className="text-sm">
@@ -287,11 +360,11 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
           />
           <form
             className="mt-6 space-y-3"
-            onSubmit={handleSubmit(handleEditTransaction)}
+            onSubmit={handleTransactionSubmit(handleEditTransaction)}
           >
             <div className="relative w-full">
               <select
-                {...register("type")}
+                {...transactionRegister("type")}
                 className={`w-full p-2 pr-10 rounded-md focus:outline-none appearance-none transition-all peer ${
                   theme === "dark"
                     ? "bg-[#27282E] border border-white text-white"
@@ -328,9 +401,9 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
                 className="absolute right-3 top-[13px] pointer-events-none transition-transform duration-300 peer-focus:rotate-180"
                 size={16}
               />
-              {errors.type && (
+              {transactionError.type && (
                 <p className="text-red-400 text-base mt-1">
-                  {errors.type.message}
+                  {transactionError.type.message}
                 </p>
               )}
             </div>
@@ -339,7 +412,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
               type="number"
               labelText="Amount"
               placeHolder="Enter amount"
-              register={register}
+              register={transactionRegister}
               divStyle="!gap-1"
               inputStyle={` p-2  [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none
                 ${
@@ -348,12 +421,12 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
                     : "border border-black text-black"
                 }
                 `}
-              errorMessage={errors.amount?.message}
+              errorMessage={transactionError.amount?.message}
             />
             <div className="relative w-full">
               <label id="category">Category</label>
               <select
-                {...register("category")}
+                {...transactionRegister("category")}
                 className={`w-full mt-1 p-2 pr-10 rounded-md   focus:outline-none appearance-none transition-all peer ${
                   theme === "dark"
                     ? "bg-[#27282E] border border-white text-white"
@@ -390,9 +463,9 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
                 className="absolute right-3 top-[42px] pointer-events-none transition-transform duration-300 peer-focus:rotate-180"
                 size={16}
               />
-              {errors.category && (
+              {transactionError.category && (
                 <p className="text-red-400 text-base mt-1">
-                  {errors.category.message}
+                  {transactionError.category.message}
                 </p>
               )}
             </div>
@@ -400,34 +473,34 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
               name="date"
               type="date"
               labelText="Date"
-              register={register}
+              register={transactionRegister}
               divStyle="!gap-1"
               inputStyle={`p-2 ${
                 theme === "dark"
                   ? "bg-[#27282E] border border-white text-white"
                   : "border border-black text-black"
               }`}
-              errorMessage={errors.date?.message}
+              errorMessage={transactionError.date?.message}
             />
             <InputAndLabel
               name="description"
               type="text"
               labelText="description (optional)"
               placeHolder="Add a note"
-              register={register}
+              register={transactionRegister}
               divStyle="!gap-1"
               inputStyle={`p-2 ${
                 theme === "dark"
                   ? "bg-[#27282E] border border-white text-white"
                   : "border border-black text-black"
               }`}
-              errorMessage={errors.description?.message}
+              errorMessage={transactionError.description?.message}
             />
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
                 id="recurring"
-                {...register("recurring")}
+                {...transactionRegister("recurring")}
                 className="w-4 h-4"
               />
               <label htmlFor="recurring" className="text-sm">
@@ -445,9 +518,9 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
               <button
                 type="submit"
                 className={`bg-blue-600 text-white px-4 py-2 rounded-md ${
-                  !isDirty ? "cursor-not-allowed" : "cursor-pointer"
+                  !transactionIsDirty ? "cursor-not-allowed" : "cursor-pointer"
                 }`}
-                disabled={!isDirty}
+                disabled={!transactionIsDirty}
               >
                 Submit
               </button>
@@ -494,6 +567,155 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
               </button>
             </div>
           </div>
+        </div>
+      );
+      break;
+    case "add_subBudget":
+      modalContent = (
+        <div>
+          <Text
+            Element="h2"
+            text="Add Category"
+            style="!text-xl lg:!text-2xl "
+          />
+          <form
+            className="mt-4 space-y-4"
+            onSubmit={handleSubmit(handleBudgetSubmit)}
+          >
+            <div className="relative w-full">
+              <label id="category">Category</label>
+              <select
+                {...register("category")}
+                className={`w-full mt-1 p-2 pr-10 rounded-md focus:outline-none appearance-none transition-all peer ${
+                  theme === "dark"
+                    ? "bg-[#27282E] border border-white text-white"
+                    : "border border-black text-black"
+                }`}
+              >
+                <option value="">Select Category</option>
+                {categories.map((item, index) => (
+                  <option key={index} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+              <FaAngleDown
+                className="absolute right-3 top-[40px] pointer-events-none transition-transform duration-300 peer-focus:rotate-180"
+                size={16}
+              />
+              {errors.category && (
+                <p className="text-red-400 text-base mt-1">
+                  {errors.category.message}
+                </p>
+              )}
+            </div>
+            <InputAndLabel
+              name="budget"
+              type="number"
+              labelText="Budget for category"
+              placeHolder="Enter amount"
+              register={register}
+              divStyle="!gap-1 "
+              inputStyle={` p-2  [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none
+                ${
+                  theme === "dark"
+                    ? "bg-[#27282E] border border-white text-white"
+                    : "border border-black text-black"
+                }
+                `}
+              errorMessage={errors.budget?.message}
+            />
+            <div className="flex gap-2  justify-end">
+              <button
+                className="px-4 py-2 bg-gray-100 rounded-md text-black cursor-pointer"
+                onClick={handleCancel}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className={`bg-blue-600 text-white px-4 py-2 rounded-md `}
+              >
+                Submit
+              </button>
+            </div>
+          </form>
+        </div>
+      );
+      break;
+    case "edit_subBudget":
+      modalContent = (
+        <div>
+          <Text
+            Element="h2"
+            text="Edit Category Budget"
+            style="!text-xl lg:!text-2xl "
+          />
+          <form
+            className="mt-4 space-y-4"
+            onSubmit={handleSubmit(handleBudgetEdit)}
+          >
+            <div className="relative w-full">
+              <label id="category">Category</label>
+              <select
+                {...register("category")}
+                className={`w-full mt-1 p-2 pr-10 rounded-md focus:outline-none appearance-none transition-all peer ${
+                  theme === "dark"
+                    ? "bg-[#27282E] border border-white text-white"
+                    : "border border-black text-black"
+                }`}
+              >
+                <option value="">Select Category</option>
+                {categories.map((item, index) => (
+                  <option key={index} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+              <FaAngleDown
+                className="absolute right-3 top-[40px] pointer-events-none transition-transform duration-300 peer-focus:rotate-180"
+                size={16}
+              />
+              {errors.category && (
+                <p className="text-red-400 text-base mt-1">
+                  {errors.category.message}
+                </p>
+              )}
+            </div>
+            <InputAndLabel
+              name="budget"
+              type="number"
+              labelText="Budget for category"
+              placeHolder="Enter amount"
+              register={register}
+              divStyle="!gap-1 "
+              inputStyle={` p-2  [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none
+                ${
+                  theme === "dark"
+                    ? "bg-[#27282E] border border-white text-white"
+                    : "border border-black text-black"
+                }
+                `}
+              errorMessage={errors.budget?.message}
+            />
+            <div className="flex gap-2  justify-end">
+              <button
+                className="px-4 py-2 bg-gray-100 rounded-md text-black cursor-pointer"
+                onClick={handleCancel}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className={`bg-blue-600 text-white px-4 py-2 rounded-md ${
+                  !isDirty ? "cursor-not-allowed" : "cursor-pointer"
+                }`}
+                disabled={!isDirty}
+              >
+                Submit
+              </button>
+            </div>
+          </form>
         </div>
       );
       break;

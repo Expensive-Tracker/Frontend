@@ -11,7 +11,8 @@ import { handleUserSignOut } from "@/store/slice/userSlice";
 import { redirect } from "next/navigation";
 import { HiOutlineMenuAlt1 } from "react-icons/hi";
 import { handleMobileMenuOpen } from "@/store/slice/uiSlice";
-import Image from "next/image";
+import Text from "./common/text/text";
+import { BiWalletAlt } from "react-icons/bi";
 
 function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState<boolean>(false);
@@ -65,6 +66,13 @@ function Header() {
       >
         <HiOutlineMenuAlt1 />
       </div>
+      <div className={`flex items-center gap-2 `}>
+        <BiWalletAlt size={25} />
+        <div>
+          <Text Element="h2" text="Expense" style="font-bold" />
+          <Text Element="p" text="Tracker" style="font-light -mt-1.5" isDes />
+        </div>
+      </div>
       <div className="flex items-center gap-4 ">
         {theme === "dark" ? (
           <MdOutlineWbSunny
@@ -86,7 +94,7 @@ function Header() {
             onClick={handleShowUserMenu}
           >
             {userData?.profilePic ? (
-              <Image
+              <img
                 src={userData?.profilePic}
                 className="object-cover rounded-4xl w-8 h-8"
                 alt="Avatar"

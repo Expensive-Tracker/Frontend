@@ -1,3 +1,5 @@
+import { handleUserSignOut } from "@/store/slice/userSlice";
+import store from "@/store/store";
 import axios from "axios";
 
 const axiosInstance = axios.create({
@@ -25,8 +27,12 @@ axiosInstance.interceptors.response.use(
   },
   function (err) {
     if (err.response && err.response.status === 401) {
-      localStorage.removeItem("token");
+      localStorage.removeItem("authToken");
       window.location.href = "/auth/signin";
+      store.dispatch(handleUserSignOut());
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     }
     return Promise.reject(err);
   }
