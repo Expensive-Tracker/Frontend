@@ -2,6 +2,7 @@
 
 import endpoints from "@/util/constant/endpoint";
 import axiosInstance from "../interpreter";
+import { showErrorToast } from "@/util/services/toast";
 const budgetEndpoints = endpoints.budgets;
 
 export async function handleAddBudget(body: any) {
@@ -12,6 +13,7 @@ export async function handleAddBudget(body: any) {
     );
     return response.data;
   } catch (err: any) {
+    showErrorToast(err?.response?.data?.message || "Something went wrong");
     console.error(err?.message);
   }
 }
@@ -43,6 +45,7 @@ export async function getSpecificSubBudget(
     );
     return response.data;
   } catch (err: any) {
+    showErrorToast(err?.response?.data?.message || "Something went wrong");
     console.error(err?.message);
   }
 }
@@ -77,6 +80,32 @@ export async function handleEditSubBudget(
       body
     );
     return response.data;
+  } catch (err: any) {
+    showErrorToast(err?.response?.data?.message || "Something went wrong");
+    console.error(err?.message);
+  }
+}
+
+export async function handleDeleteCategory(id: string, subId: string) {
+  try {
+    const response = await axiosInstance.delete(
+      `${budgetEndpoints.subDeleteBudgets
+        .replace(":id", id)
+        .replace(":subId", subId)}`
+    );
+    return response.data;
+  } catch (err: any) {
+    showErrorToast(err?.response?.data?.message || "Something went wrong");
+    console.error(err?.message);
+  }
+}
+
+export async function handleDeleteBudgetUser(id: string) {
+  try {
+    const result: any = await axiosInstance.delete(
+      `${budgetEndpoints.DeleteBudgets.replace(":id", id)}`
+    );
+    return result.data;
   } catch (err: any) {
     console.error(err?.message);
   }

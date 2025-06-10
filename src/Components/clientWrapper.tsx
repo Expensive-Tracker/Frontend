@@ -12,6 +12,10 @@ import SideBar from "./sideBar";
 import { useEffect, useState } from "react";
 import SplashScreen from "./splashScreen";
 
+// 🔔 Toastify imports
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 export default function ClientWrapper({
   children,
 }: {
@@ -28,6 +32,7 @@ export default function ClientWrapper({
     (state: RootState) => state.uiSlice.splashFlag
   );
   const dispatch = useDispatch();
+
   function handleChangeTheme() {
     dispatch(handleThemeChange());
   }
@@ -57,7 +62,19 @@ export default function ClientWrapper({
   }, [theme]);
 
   return (
-    <div className={`h-full  transition-all `}>
+    <div className={`h-full transition-all`}>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme={theme === "dark" ? "dark" : "light"}
+      />
+
       {authToken !== "" || window.location.href.includes("imageUpload") ? (
         splashScreen ? (
           <div className="h-screen flex items-center justify-center">
@@ -68,22 +85,20 @@ export default function ClientWrapper({
             {!window.location.href.includes("imageUpload") && <Header />}
             {!window.location.href.includes("imageUpload") && <SideBar />}
             <div
-              className={`mt-[65px] max-w-[1920px] mx-auto
-              ${
+              className={`mt-[65px] max-w-[1920px] mx-auto ${
                 uiSideBar.isOpen || uiSideBar.isHovered
                   ? "lg:pl-[220px]"
                   : "lg:pl-[60px]"
-              }
-              `}
+              }`}
             >
               {children}
             </div>
           </div>
         )
       ) : (
-        <div className="grid grid-cols-1 relative items-center justify-center lg:grid-cols-2 h-full ">
+        <div className="grid grid-cols-1 relative items-center justify-center lg:grid-cols-2 h-full">
           <div
-            className={`absolute md:bottom-6 lg:right-10 p-3 rounded-full text-black hover:bg-gray-200 transition-all bg-white shadow-md bottom-4 right-4 md:right-6  ${
+            className={`absolute md:bottom-6 lg:right-10 p-3 rounded-full text-black hover:bg-gray-200 transition-all bg-white shadow-md bottom-4 right-4 md:right-6 ${
               theme === "dark" ? "shadow-white" : "shadow-gray-700"
             } cursor-pointer`}
             onClick={handleChangeTheme}
@@ -94,7 +109,7 @@ export default function ClientWrapper({
               <IoMdMoon size={24} />
             )}
           </div>
-          <div className="  h-screen bg-[#15161A] hidden lg:block !text-white">
+          <div className="h-screen bg-[#15161A] hidden lg:block !text-white">
             <div className="justify-center gap-12 flex flex-col items-center w-[381px] m-auto h-full">
               <Image
                 src={imagePath.authBanner}
@@ -109,9 +124,7 @@ export default function ClientWrapper({
               />
               <div className="flex flex-col gap-4 xl:gap-8 ">
                 <div className="flex items-start gap-3 xl:gap-4 ">
-                  <div>
-                    <IoMdCheckmark size={24} height={24} color="#4CAF50" />
-                  </div>
+                  <IoMdCheckmark size={24} height={24} color="#4CAF50" />
                   <div>
                     <Text
                       Element="h4"
@@ -120,16 +133,13 @@ export default function ClientWrapper({
                       style="mb-1 !text-base"
                     />
                     <Text
-                      text="View and organize your finances all in one place
-and build your future with smarter wealth management"
+                      text="View and organize your finances all in one place and build your future with smarter wealth management"
                       style="opacity-70 !text-sm"
                     />
                   </div>
                 </div>
                 <div className="flex items-start gap-3 xl:gap-4 ">
-                  <div>
-                    <IoMdCheckmark size={24} height={24} color="#4CAF50" />
-                  </div>
+                  <IoMdCheckmark size={24} height={24} color="#4CAF50" />
                   <div>
                     <Text
                       Element="h4"
@@ -138,7 +148,7 @@ and build your future with smarter wealth management"
                       style="mb-1 !text-base"
                     />
                     <Text
-                      text="Your financial data is tokenized and masked with the latest Finch security. with end-to-end encryption and data privacy vaults"
+                      text="Your financial data is tokenized and masked with the latest Finch security. with end-to-end encryption and data privacy vaults"
                       style="opacity-70 !text-sm"
                     />
                   </div>

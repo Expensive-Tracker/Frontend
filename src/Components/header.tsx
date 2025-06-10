@@ -66,7 +66,7 @@ function Header() {
       >
         <HiOutlineMenuAlt1 />
       </div>
-      <div className={`flex items-center gap-2 `}>
+      <div className={`flex items-center gap-2 lg:hidden `}>
         <BiWalletAlt size={25} />
         <div>
           <Text Element="h2" text="Expense" style="font-bold" />
@@ -103,12 +103,12 @@ function Header() {
               <RxAvatar className="w-8 h-8" />
             )}
 
-            <span className="hidden md:inline">{userData.username}</span>
+            <span className="hidden lg:inline ">{userData.username}</span>
             <IoIosArrowDown />
           </div>
           <div
-            className={`absolute md:left-0 left-[-80px] top-[42px] md:top-[37px] z-10 w-[150px] rounded-b-md shadow-2xl px-8 py-3 flex flex-col items-start
-              transition-all duration-300 ease-in-out transform origin-top ${
+            className={`absolute md:left-0 left-[-80px] top-[42px] md:top-[37px] z-10 w-[150px] rounded-b-md shadow-2xl px-8 py-3  flex-col items-start
+              transition-all duration-300 ease-in-out transform origin-top   ${
                 userMenuOpen
                   ? "opacity-100 scale-100"
                   : "opacity-0 scale-95 pointer-events-none"

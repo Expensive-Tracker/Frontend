@@ -56,8 +56,8 @@ export interface Budget {
   budgetAmount: number;
   category?: SubBudget[];
   month: string;
-  totalSpent?: number | string;
-  totalRemain?: number | string;
+  totalSpent?: number;
+  totalRemain?: number;
   createdAt?: string;
   updatedAt?: string;
 }

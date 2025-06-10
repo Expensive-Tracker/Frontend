@@ -11,15 +11,11 @@ export async function handleGetTransaction(
   search: string,
   body: bodyTransaction
 ) {
-  try {
-    const response = await axiosInstance.post(
-      `${transactionEndpoint.getUserTransaction}?page=${page}&limit=${limit}&search=${search}`,
-      body
-    );
-    return response.data;
-  } catch (err: any) {
-    console.error(err?.message);
-  }
+  const response = await axiosInstance.post(
+    `${transactionEndpoint.getUserTransaction}?page=${page}&limit=${limit}&search=${search}`,
+    body
+  );
+  return response.data;
 }
 
 export async function handleGetSpecificTransaction(id: string) {

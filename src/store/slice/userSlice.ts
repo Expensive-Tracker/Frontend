@@ -26,6 +26,7 @@ const userSlice = createSlice({
       state.isNew.remain.budgets = true;
       state.isNew.remain.transaction = true;
     },
+
     handleSetNewFalse: (state) => {
       state.isNew.new = false;
       state.isNew.remain.budgets = false;

@@ -10,7 +10,7 @@ import {
   ColumnDef,
   getPaginationRowModel,
 } from "@tanstack/react-table";
-import { FaEdit, FaPlus } from "react-icons/fa";
+import { FaEdit, FaPlus, FaWallet } from "react-icons/fa";
 import { FiDelete } from "react-icons/fi";
 import { formatDate } from "@/util/services/date";
 import Badge from "@/components/common/badge/badge";
@@ -25,12 +25,16 @@ import { handleGetTransaction } from "@/util/api/apis/transaction";
 import Modal, { categories } from "@/components/common/modal/modal";
 import { handleOpenAndCloseModal, handleRefetch } from "@/store/slice/uiSlice";
 import Text from "@/components/common/text/text";
+import { handleSetRemainTrue } from "@/store/slice/userSlice";
 
 const TransactionTable = () => {
   const theme = useSelector((state: RootState) => state.theme.theme);
   const userId = useSelector((state: RootState) => state.user.userDetail._id);
   const isOpen = useSelector((state: RootState) => state.uiSlice.modal.isOpen);
   const refetch = useSelector((state: RootState) => state.uiSlice.refetch);
+  const transactionExits = useSelector(
+    (state: RootState) => state.user.isNew.remain.transaction
+  );
   const [sorting, setSorting] = useState<SortingState>([]);
   const [data, setData] = useState<Transaction[]>();
   const [showFilter, setShowFilter] = useState<boolean>(false);
@@ -59,6 +63,8 @@ const TransactionTable = () => {
     totalPages: 1,
   });
   const dispatch = useDispatch();
+  const textPrimary = theme === "dark" ? "text-white" : "text-gray-900";
+  const textSecondary = theme === "dark" ? "text-gray-300" : "text-gray-600";
 
   useEffect(() => {
     if (refetch) dispatch(handleRefetch());
@@ -123,7 +129,9 @@ const TransactionTable = () => {
         ...response.result.data.pagination,
       }));
     } catch (err: any) {
-      console.error("Failed to fetch transactions:", err.message);
+      if (err.response?.status === 404) {
+        dispatch(handleSetRemainTrue("transaction"));
+      }
     } finally {
       setLoading(false);
     }
@@ -290,6 +298,52 @@ const TransactionTable = () => {
     pageCount: pagination.totalPages,
   });
 
+  if (transactionExits) {
+    return (
+      <div
+        className={`w-full flex items-center justify-center flex-col gap-4 p-8 rounded-xl  ${textPrimary} `}
+      >
+        <div
+          className={`p-4 rounded-full ${
+            theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"
+          }`}
+        >
+          <FaWallet
+            className={`text-3xl ${
+              theme === "dark" ? "text-blue-400" : "text-blue-600"
+            }`}
+          />
+        </div>
+        <div className="text-center">
+          <h3 className={`text-lg font-semibold mb-2 ${textPrimary}`}>
+            No Transaction Set
+          </h3>
+          <p className={`mb-4 ${textSecondary}`}>
+            Create your first Transaction to start tracking your expenses
+          </p>
+        </div>
+        <Button
+          className="flex items-center gap-2 px-6 py-3 -mt-2 rounded-lg font-medium transition-all duration-200"
+          onClick={() => {
+            setModalDetail((pre) => ({
+              ...pre,
+              modalId: "add",
+              transactionId: "",
+            }));
+            dispatch(handleOpenAndCloseModal());
+          }}
+        >
+          <FaPlus /> Add Transaction
+        </Button>
+        {isOpen && (
+          <Modal
+            id={modalDetail.modalId}
+            transactionId={modalDetail.transactionId}
+          />
+        )}
+      </div>
+    );
+  }
   return (
     <div
       className={`p-4 py-6 ${

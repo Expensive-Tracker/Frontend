@@ -25,14 +25,12 @@ axiosInstance.interceptors.response.use(
   function (response) {
     return response;
   },
-  function (err) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function (err: any) {
     if (err.response && err.response.status === 401) {
       localStorage.removeItem("authToken");
-      window.location.href = "/auth/signin";
+      window.location.replace("/auth/signin");
       store.dispatch(handleUserSignOut());
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
     }
     return Promise.reject(err);
   }

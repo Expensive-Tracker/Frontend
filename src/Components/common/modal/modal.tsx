@@ -22,8 +22,17 @@ import { budgetSchemaMain } from "@/util/validation/budgetValidation";
 import {
   getSpecificSubBudget,
   handleCreateSubBudget,
+  handleDeleteBudgetUser,
+  handleDeleteCategory,
   handleEditSubBudget,
 } from "@/util/api/apis/budgets";
+import { showErrorToast } from "@/util/services/toast";
+import { SubBudget } from "@/util/interface/slice";
+import {
+  handleSetRemainFalse,
+  handleSetRemainTrue,
+} from "@/store/slice/userSlice";
+import { handleSetBudget } from "@/store/slice/budgetSlice";
 
 const transactionType = ["Select Transaction Type", "Income", "Expense"];
 export const categories = [
@@ -40,6 +49,21 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
     (state: RootState) => state.user.userDetail._id
   );
   const budgetId = useSelector((state: RootState) => state.budget._id ?? "");
+  const budgetCategory = useSelector(
+    (state: RootState) => state.budget.category
+  );
+  const transactionExits = useSelector(
+    (state: RootState) => state.user.isNew.remain
+  );
+  const updatedCategory =
+    budgetCategory?.length ?? 0 > 0
+      ? categories.filter(
+          (data: string) =>
+            !budgetCategory?.some(
+              (item: SubBudget) => item.categoryName === data
+            )
+        )
+      : categories;
 
   const [editDetail, setEditDetail] = useState({
     amount: 0,
@@ -81,6 +105,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
     reset,
     getValues,
     formState: { errors, isDirty },
+    watch,
   } = useForm({
     defaultValues: {
       budget: undefined,
@@ -88,6 +113,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
     },
     resolver: yupResolver(budgetSchemaMain),
   });
+  const watchBudget = watch("budget");
 
   function handleModalClose() {
     dispatch(handleOpenAndCloseModal());
@@ -96,6 +122,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
   useEffect(() => {
     resetTransaction();
     if (transactionId) {
+      if (id.includes("delete_Budget")) return;
       if (isSubBudget) {
         handleGetSpecificSubBudget();
       } else {
@@ -107,12 +134,14 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
   async function handleGetSpecificSubBudget() {
     try {
       const result = await getSpecificSubBudget(budgetId, transactionId);
-      const budgetValue = result?.data.subBudgetAmount;
+      const budgetValue = result?.category.subBudgetAmount;
+
       reset({
         budget: budgetValue,
-        category: "",
+        category: result?.category?.categoryName,
       });
     } catch (err: any) {
+      showErrorToast(err?.response?.data?.message || "Something went wrong");
       console.error(err?.message);
     }
   }
@@ -135,6 +164,29 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
       setEditDetail(data);
       resetTransaction(data);
     } catch (err: any) {
+      showErrorToast(err?.response?.data?.message || "Something went wrong");
+      console.error(err?.message);
+    }
+  }
+
+  async function handleDeleteBudget() {
+    try {
+      await handleDeleteBudgetUser(transactionId);
+      dispatch(handleSetRemainTrue("budgets"));
+      dispatch(
+        handleSetBudget({
+          budgetAmount: 0,
+          month: "",
+          category: [],
+          _id: "",
+          totalRemain: 0,
+          totalSpent: 0,
+        })
+      );
+      dispatch(handleRefetch());
+      dispatch(handleOpenAndCloseModal());
+    } catch (err: any) {
+      showErrorToast(err?.response?.data?.message || "Something went wrong");
       console.error(err?.message);
     }
   }
@@ -144,9 +196,12 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
       const data = getTransactionValue();
       data._id = userDetail;
       await handleAddNewTransaction(data);
+      if (transactionExits.transaction)
+        dispatch(handleSetRemainFalse("transaction"));
       dispatch(handleRefetch());
       dispatch(handleOpenAndCloseModal());
     } catch (err: any) {
+      showErrorToast(err?.response?.data?.message || "Something went wrong");
       console.error(err?.message);
     }
   };
@@ -163,7 +218,8 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
       dispatch(handleRefetch());
       dispatch(handleOpenAndCloseModal());
     } catch (err: any) {
-      console.error(err?.message);
+      showErrorToast(err?.response?.data?.message || "Something went wrong");
+      console.error(err);
     }
   }
 
@@ -177,6 +233,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
       dispatch(handleRefetch());
       dispatch(handleOpenAndCloseModal());
     } catch (err: any) {
+      showErrorToast(err?.response?.data?.message || "Something went wrong");
       console.error(err?.message);
     }
   }
@@ -190,6 +247,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
       dispatch(handleRefetch());
       dispatch(handleOpenAndCloseModal());
     } catch (err: any) {
+      showErrorToast(err?.response?.data?.message || "Something went wrong");
       console.error(err?.message);
     }
   };
@@ -199,6 +257,17 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
     reset();
     dispatch(handleOpenAndCloseModal());
   };
+  const handleDeleteSubBudget = async () => {
+    try {
+      const result = await handleDeleteCategory(budgetId, transactionId);
+      if (!result) return;
+      dispatch(handleRefetch());
+      dispatch(handleOpenAndCloseModal());
+    } catch (err: any) {
+      showErrorToast(err?.response?.data?.message || "Something went wrong");
+      console.error(err?.message);
+    }
+  };
 
   const handleDeleteTransaction = async () => {
     try {
@@ -207,6 +276,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
       dispatch(handleOpenAndCloseModal());
       console.log(result);
     } catch (err: any) {
+      showErrorToast(err?.response?.data?.message || "Something went wrong");
       console.error(err?.message);
     }
   };
@@ -593,11 +663,13 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
                 }`}
               >
                 <option value="">Select Category</option>
-                {categories.map((item, index) => (
-                  <option key={index} value={item}>
-                    {item}
-                  </option>
-                ))}
+                {updatedCategory
+                  .filter((item) => item !== "Salary")
+                  .map((item, index) => (
+                    <option key={index} value={item}>
+                      {item}
+                    </option>
+                  ))}
               </select>
               <FaAngleDown
                 className="absolute right-3 top-[40px] pointer-events-none transition-transform duration-300 peer-focus:rotate-180"
@@ -655,33 +727,6 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
             className="mt-4 space-y-4"
             onSubmit={handleSubmit(handleBudgetEdit)}
           >
-            <div className="relative w-full">
-              <label id="category">Category</label>
-              <select
-                {...register("category")}
-                className={`w-full mt-1 p-2 pr-10 rounded-md focus:outline-none appearance-none transition-all peer ${
-                  theme === "dark"
-                    ? "bg-[#27282E] border border-white text-white"
-                    : "border border-black text-black"
-                }`}
-              >
-                <option value="">Select Category</option>
-                {categories.map((item, index) => (
-                  <option key={index} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-              <FaAngleDown
-                className="absolute right-3 top-[40px] pointer-events-none transition-transform duration-300 peer-focus:rotate-180"
-                size={16}
-              />
-              {errors.category && (
-                <p className="text-red-400 text-base mt-1">
-                  {errors.category.message}
-                </p>
-              )}
-            </div>
             <InputAndLabel
               name="budget"
               type="number"
@@ -710,12 +755,94 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
                 className={`bg-blue-600 text-white px-4 py-2 rounded-md ${
                   !isDirty ? "cursor-not-allowed" : "cursor-pointer"
                 }`}
-                disabled={!isDirty}
+                disabled={!isDirty && watchBudget === getValues().budget}
               >
                 Submit
               </button>
             </div>
           </form>
+        </div>
+      );
+      break;
+    case "delete_subBudget":
+      modalContent = (
+        <div>
+          <Text
+            Element="h2"
+            text="Delete Category"
+            style="!text-xl lg:!text-2xl "
+          />
+          <div className="flex flex-col mt-4 gap-4">
+            <div>
+              <Text
+                Element="h3"
+                text="Are you sure about that?"
+                style="!text-xl"
+              />
+              <Text
+                isDes
+                text="Action can not be reverted."
+                style="-mt-1 text-gray-300"
+              />
+            </div>
+            <div className="self-end flex items-center gap-4">
+              {" "}
+              <button
+                className="px-4 py-2 bg-gray-100 rounded-md text-black cursor-pointer"
+                onClick={handleCancel}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                onClick={handleDeleteSubBudget}
+                className="bg-red-600 text-white px-4 py-2 rounded-md cursor-pointer"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+      break;
+    case "delete_Budget":
+      modalContent = (
+        <div>
+          <Text
+            Element="h2"
+            text="Delete Category"
+            style="!text-xl lg:!text-2xl "
+          />
+          <div className="flex flex-col mt-4 gap-4">
+            <div>
+              <Text
+                Element="h3"
+                text="Are you sure about that?"
+                style="!text-xl"
+              />
+              <Text
+                isDes
+                text="Action can not be reverted."
+                style="-mt-1 text-gray-300"
+              />
+            </div>
+            <div className="self-end flex items-center gap-4">
+              {" "}
+              <button
+                className="px-4 py-2 bg-gray-100 rounded-md text-black cursor-pointer"
+                onClick={handleCancel}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                onClick={handleDeleteBudget}
+                className="bg-red-600 text-white px-4 py-2 rounded-md cursor-pointer"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
         </div>
       );
       break;

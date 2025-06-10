@@ -35,13 +35,15 @@ const SideBar = () => {
       <div
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className={`fixed ${sidebarWidth} z-50 left-0 top-0 h-full border-r border-collapse lg:block hidden border-r-[#27282E] transition-all`}
+        className={`fixed ${sidebarWidth} z-50 left-0 top-0 h-full ${
+          theme === "dark" ? "bg-[#1B1C21]" : "bg-white"
+        } border-r border-collapse lg:block hidden border-r-[#27282E] transition-all `}
       >
         {/* sidebar header */}
         <div
-          className={`px-6 py-1.5 pb-2.5 ${
-            uiData.isOpen || uiData.isHovered ? "" : " mt-4 pl-4.5"
-          }  flex items-start  flex-col gap-0 relative`}
+          className={`px-6 py-1 pb-2.5 ${
+            uiData.isOpen || uiData.isHovered ? "" : " mt-4 pl-4.5 py-[5px]"
+          }  flex items-start border-b border-b-[#27282E]  flex-col gap-0 relative`}
         >
           <div className={`flex items-center gap-2 `}>
             <BiWalletAlt size={25} />
