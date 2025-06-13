@@ -26,6 +26,11 @@ const endpoints = {
     DeleteBudgets: "/budgets/:id",
     subDeleteBudgets: "/budgets/:id/:subId",
   },
+  analytics: {
+    totalIncome: "analytics/summary",
+    monthlyTrends: "analytics/monthly",
+    categoryExpense: "analytics/category-breakdown",
+  },
 };
 
 export default endpoints;

@@ -15,23 +15,16 @@ export const loginValidationSchema = object({
   password: string()
     .required("password is required")
     .min(8, "Minimum 8 character is required")
-    .max(20, "Maximum 20 character is required")
-    .matches(/[a-z]/, "Password must contain at least one lowercase letter")
-    .matches(/[A-Z]/, "Password must contain at least one uppercase letter"),
+    .max(20, "Maximum 20 character is required"),
 });
 
 export const registerValidationSchema = object({
-  username: string()
-    .required("Username is required")
-    .matches(/[A-Z]/, "Username must contain at least one uppercase letter"),
-  // .matches(/[0-9]/, "Username must contain at least one numeric value"),
+  username: string().required("Username is required"),
   email: string().required("email is required").email("enter correct email"),
   password: string()
     .required("password is required")
     .min(8, "Minimum 8 character is required")
-    .max(20, "Maximum 20 character is required")
-    .matches(/[a-z]/, "Password must contain at least one lowercase letter")
-    .matches(/[A-Z]/, "Password must contain at least one uppercase letter"),
+    .max(20, "Maximum 20 character is required"),
 });
 
 export const emailValidationSchema = object({

@@ -21,7 +21,6 @@ const uiSlice = createSlice({
   reducers: {
     handleShowSplashScreen: (state) => {
       state.splashScreen = !state.splashScreen;
-      console.log(state.splashScreen);
     },
     handleChangeSplashFlag: (state) => {
       state.splashFlag = !state.splashFlag;

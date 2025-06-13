@@ -11,7 +11,7 @@ import {
   getPaginationRowModel,
 } from "@tanstack/react-table";
 import { FaEdit, FaPlus, FaWallet } from "react-icons/fa";
-import { FiDelete } from "react-icons/fi";
+import { IoTrashBinSharp } from "react-icons/io5";
 import { formatDate } from "@/util/services/date";
 import Badge from "@/components/common/badge/badge";
 import { useDispatch, useSelector } from "react-redux";
@@ -276,7 +276,7 @@ const TransactionTable = () => {
                   : "border-gray-300 text-gray-600"
               }`}
             >
-              <FiDelete />
+              <IoTrashBinSharp />
             </button>
           </div>
         );
@@ -318,12 +318,12 @@ const TransactionTable = () => {
           <h3 className={`text-lg font-semibold mb-2 ${textPrimary}`}>
             No Transaction Set
           </h3>
-          <p className={`mb-4 ${textSecondary}`}>
+          <p className={` ${textSecondary}`}>
             Create your first Transaction to start tracking your expenses
           </p>
         </div>
         <Button
-          className="flex items-center gap-2 px-6 py-3 -mt-2 rounded-lg font-medium transition-all duration-200"
+          className="flex items-center gap-2  rounded-lg font-medium transition-all duration-200"
           onClick={() => {
             setModalDetail((pre) => ({
               ...pre,

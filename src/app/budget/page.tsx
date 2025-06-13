@@ -22,6 +22,7 @@ const Budgets = () => {
     id: "add_subBudget",
     transactionId: "",
   });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme.theme);
   const budgetCategory = useSelector(
@@ -101,13 +102,13 @@ const Budgets = () => {
         <h3 className={`text-lg font-semibold mb-2 ${textPrimary}`}>
           No Budget Categories
         </h3>
-        <p className={`mb-4 ${textSecondary}`}>
+        <p className={` ${textSecondary}`}>
           Create budget categories to organize and track your spending
         </p>
       </div>
       {!allCategoriesAdded && (
         <Button
-          className={`flex items-center gap-2 -mt-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 `}
+          className={`flex items-center gap-2  rounded-lg font-medium transition-all duration-200 `}
           onClick={() => {
             handleAddModelDetail();
             handleResetState();
@@ -122,7 +123,11 @@ const Budgets = () => {
 
   return (
     <div className="p-4 py-6">
-      <BudgetArea handleModelOpen={handleAddModelDelete} />
+      <BudgetArea
+        handleModelOpen={handleAddModelDelete}
+        setIsLoading={setIsLoading}
+        loading={isLoading}
+      />
       <div className="md:mt-6 mt-3">
         {budgetCategory?.length <= 0 ? (
           budgetExits ? (
@@ -151,6 +156,7 @@ const Budgets = () => {
                 <SubCategory
                   key={item._id}
                   item={item}
+                  loading={isLoading}
                   handleAddModelEditDetail={handleAddModelEditDetail}
                   handleAddModelDeleteDetail={handleAddModelDeleteDetail}
                 />

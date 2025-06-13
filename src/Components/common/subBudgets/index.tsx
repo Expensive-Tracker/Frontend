@@ -8,15 +8,18 @@ import { BsThreeDots } from "react-icons/bs";
 import { FaRegEdit, FaChartLine } from "react-icons/fa";
 import { MdDelete, MdTrendingUp, MdTrendingDown } from "react-icons/md";
 import { BiWallet, BiMoney } from "react-icons/bi";
+import SubCategorySkeleton from "../subCategorySkeleton";
 
 const SubCategory = ({
   item,
   handleAddModelEditDetail,
   handleAddModelDeleteDetail,
+  loading,
 }: {
   item: any;
   handleAddModelEditDetail: (id: string) => void;
   handleAddModelDeleteDetail: (id: string) => void;
+  loading: boolean;
 }) => {
   const theme = useSelector((state: RootState) => state.theme.theme);
   const [showMenu, setShowMenu] = useState<boolean>(false);
@@ -108,6 +111,10 @@ const SubCategory = ({
   const statusConfig = getStatusConfig();
   const StatusIcon = statusConfig.icon;
 
+  if (loading) {
+    return <SubCategorySkeleton theme={theme} />;
+  }
+
   return (
     <div
       className={`w-full ${colors.bgColor} ${colors.borderColor} border shadow-lg rounded-2xl p-6 space-y-6 transition-all duration-300 hover:shadow-xl`}
@@ -178,14 +185,6 @@ const SubCategory = ({
         </div>
       </div>
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <span className={`text-sm font-medium ${colors.textSecondary}`}>
-            Progress
-          </span>
-          <span className={`text-sm font-bold ${statusConfig.color.text}`}>
-            {percentage}%
-          </span>
-        </div>
         <ProgressBar
           percentage={percentage}
           spent={totalSpent}

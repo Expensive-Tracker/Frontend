@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Text from "./common/text/text";
 import navItem from "@/util/constant/navItem";
 import { navItemInterface } from "@/util/interface/props";
@@ -18,9 +18,21 @@ const SideBar = () => {
   const uiData = useSelector((state: RootState) => state.uiSlice.sidebar);
   const pathname = usePathname();
   const dispatch = useDispatch();
+  useEffect(() => {
+    if (uiData.mobileOpen) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, [uiData.mobileOpen]);
   const handleMouseEnter = () => {
     dispatch(handleHoverIn());
   };
+
   const handleShowMenu = () => {
     dispatch(handleOpenAndClose());
   };
@@ -125,7 +137,7 @@ const SideBar = () => {
       </div>
       {/* mobile */}
       <div
-        className={`lg:hidden absolute grid grid-cols-[200px_auto] items-start h-screen w-screen z-[1000] -top-1.5  transition-all ${
+        className={`lg:hidden absolute grid grid-cols-[200px_auto] items-start h-full w-screen z-[1000] -top-1.5  transition-all ${
           uiData.mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >

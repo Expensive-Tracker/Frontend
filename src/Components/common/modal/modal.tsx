@@ -141,7 +141,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
         category: result?.category?.categoryName,
       });
     } catch (err: any) {
-      showErrorToast(err?.response?.data?.message || "Something went wrong");
+      showErrorToast("Something went wrong");
       console.error(err?.message);
     }
   }
@@ -159,12 +159,12 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
         category: result?.data?.category || "",
         date: formattedDate,
         description: result?.data?.description || "",
-        recurring: result?.data?.isRecurring || false,
+        recurring: result?.data?.recurring || false,
       };
       setEditDetail(data);
       resetTransaction(data);
     } catch (err: any) {
-      showErrorToast(err?.response?.data?.message || "Something went wrong");
+      showErrorToast("Something went wrong");
       console.error(err?.message);
     }
   }
@@ -186,7 +186,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
       dispatch(handleRefetch());
       dispatch(handleOpenAndCloseModal());
     } catch (err: any) {
-      showErrorToast(err?.response?.data?.message || "Something went wrong");
+      showErrorToast("Something went wrong");
       console.error(err?.message);
     }
   }
@@ -201,7 +201,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
       dispatch(handleRefetch());
       dispatch(handleOpenAndCloseModal());
     } catch (err: any) {
-      showErrorToast(err?.response?.data?.message || "Something went wrong");
+      showErrorToast("Something went wrong");
       console.error(err?.message);
     }
   };
@@ -218,7 +218,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
       dispatch(handleRefetch());
       dispatch(handleOpenAndCloseModal());
     } catch (err: any) {
-      showErrorToast(err?.response?.data?.message || "Something went wrong");
+      showErrorToast("Something went wrong");
       console.error(err);
     }
   }
@@ -233,7 +233,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
       dispatch(handleRefetch());
       dispatch(handleOpenAndCloseModal());
     } catch (err: any) {
-      showErrorToast(err?.response?.data?.message || "Something went wrong");
+      showErrorToast("Something went wrong");
       console.error(err?.message);
     }
   }
@@ -247,7 +247,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
       dispatch(handleRefetch());
       dispatch(handleOpenAndCloseModal());
     } catch (err: any) {
-      showErrorToast(err?.response?.data?.message || "Something went wrong");
+      showErrorToast("Something went wrong");
       console.error(err?.message);
     }
   };
@@ -264,7 +264,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
       dispatch(handleRefetch());
       dispatch(handleOpenAndCloseModal());
     } catch (err: any) {
-      showErrorToast(err?.response?.data?.message || "Something went wrong");
+      showErrorToast("Something went wrong");
       console.error(err?.message);
     }
   };
@@ -276,7 +276,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
       dispatch(handleOpenAndCloseModal());
       console.log(result);
     } catch (err: any) {
-      showErrorToast(err?.response?.data?.message || "Something went wrong");
+      showErrorToast("Something went wrong");
       console.error(err?.message);
     }
   };

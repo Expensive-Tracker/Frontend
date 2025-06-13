@@ -30,9 +30,85 @@ import { showErrorToast } from "@/util/services/toast";
 
 interface props {
   handleModelOpen: (id: string) => void;
+  setIsLoading: (id: boolean) => void;
+  loading: boolean;
 }
 
-const BudgetArea = ({ handleModelOpen }: props) => {
+// Skeleton Loader Component
+const BudgetSkeleton = ({ theme }: { theme: string }) => {
+  const bgColor = theme === "dark" ? "bg-zinc-900" : "bg-white";
+  const borderColor = theme === "dark" ? "border-zinc-700" : "border-gray-200";
+  const skeletonBg = theme === "dark" ? "bg-zinc-800" : "bg-gray-200";
+  const skeletonShimmer =
+    theme === "dark"
+      ? "bg-gradient-to-r from-zinc-800 via-zinc-700 to-zinc-800"
+      : "bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200";
+
+  return (
+    <div
+      className={`flex flex-col gap-6 p-6 rounded-xl shadow-lg transition-colors duration-300 ${bgColor} ${borderColor} border animate-pulse`}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className={`h-6 w-32 rounded ${skeletonBg} animate-shimmer`}></div>
+        <div className={`h-8 w-8 rounded-lg ${skeletonBg}`}></div>
+      </div>
+
+      {/* Main Budget Display */}
+      <div
+        className={`p-4 rounded-lg ${skeletonBg} border-l-4 border-l-gray-400`}
+      >
+        <div
+          className={`h-12 w-48 rounded mb-2 ${skeletonShimmer} animate-shimmer`}
+        ></div>
+        <div
+          className={`h-4 w-36 rounded ${skeletonShimmer} animate-shimmer`}
+        ></div>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {[1, 2].map((item) => (
+          <div
+            key={item}
+            className={`p-4 rounded-lg ${skeletonBg} border-l-4 border-l-gray-400`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div
+                className={`h-4 w-20 rounded ${skeletonShimmer} animate-shimmer`}
+              ></div>
+              <div
+                className={`h-8 w-8 rounded-md ${skeletonShimmer} animate-shimmer`}
+              ></div>
+            </div>
+            <div
+              className={`h-8 w-24 rounded ${skeletonShimmer} animate-shimmer`}
+            ></div>
+          </div>
+        ))}
+      </div>
+
+      {/* Budget Health */}
+      <div
+        className={`flex items-center justify-between p-3 rounded-lg ${skeletonBg}`}
+      >
+        <div
+          className={`h-4 w-24 rounded ${skeletonShimmer} animate-shimmer`}
+        ></div>
+        <div className="flex items-center gap-2">
+          <div
+            className={`w-3 h-3 rounded-full ${skeletonShimmer} animate-shimmer`}
+          ></div>
+          <div
+            className={`h-4 w-16 rounded ${skeletonShimmer} animate-shimmer`}
+          ></div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const BudgetArea = ({ handleModelOpen, setIsLoading, loading }: props) => {
   const isNew = useSelector((state: RootState) => state.user.isNew);
   const theme = useSelector((state: RootState) => state.theme.theme);
   const userId = useSelector((state: RootState) => state.user.userDetail._id);
@@ -42,6 +118,7 @@ const BudgetArea = ({ handleModelOpen }: props) => {
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [showForm, setShowForm] = useState<boolean>(false);
   const [hasBudget, setHasBudget] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
 
@@ -152,8 +229,10 @@ const BudgetArea = ({ handleModelOpen }: props) => {
 
   const getUserBudget = async () => {
     try {
+      setIsLoading(true);
       const result = await handleGetUserBudget(userId);
       if (!result) {
+        setIsLoading(false);
         return;
       }
       dispatch(handleSetBudget(result?.budget));
@@ -167,6 +246,8 @@ const BudgetArea = ({ handleModelOpen }: props) => {
       } else {
         console.error("Error fetching user budget:", err?.message);
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -180,6 +261,7 @@ const BudgetArea = ({ handleModelOpen }: props) => {
 
   const onSubmit = async () => {
     try {
+      setIsSubmitting(true);
       const { budget } = getValues();
 
       if (!budget || budget <= 0) {
@@ -219,8 +301,10 @@ const BudgetArea = ({ handleModelOpen }: props) => {
         }
       }
     } catch (error: any) {
-      showErrorToast(error?.message || "Something went wrong");
+      showErrorToast("Something went wrong");
       console.error("Error submitting budget:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -243,6 +327,10 @@ const BudgetArea = ({ handleModelOpen }: props) => {
   const remainingColors = isPositive
     ? chartColors.remaining.positive
     : chartColors.remaining.negative;
+
+  if (loading && !(isNew?.remain?.budgets === true)) {
+    return <BudgetSkeleton theme={theme} />;
+  }
 
   if (!hasBudget && !showForm && !edit) {
     return (
@@ -320,15 +408,26 @@ const BudgetArea = ({ handleModelOpen }: props) => {
 
         <button
           type="submit"
-          className={`w-full py-3 rounded-lg text-lg font-medium transition-all duration-200 ${buttonColors.success}`}
+          disabled={isSubmitting}
+          className={`w-full py-3 rounded-lg text-lg font-medium transition-all duration-200 ${
+            buttonColors.success
+          } ${
+            isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+          } flex items-center justify-center gap-2`}
         >
-          {edit ? "Update Budget" : "Submit Budget"}
+          {isSubmitting ? (
+            <>
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              {edit ? "Updating..." : "Creating..."}
+            </>
+          ) : (
+            <>{edit ? "Update Budget" : "Submit Budget"}</>
+          )}
         </button>
       </form>
     );
   }
 
-  // Show budget dashboard for users with existing budget
   return (
     <div
       className={`flex flex-col gap-6 p-6 rounded-xl shadow-lg transition-colors duration-300 ${bgColor} ${textPrimary} ${borderColor} border`}
