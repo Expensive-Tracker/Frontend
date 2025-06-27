@@ -67,12 +67,11 @@ async function handleChangePassword(userData: Partial<userSliceState>) {
   }
 }
 
-async function handleDeleteUser(userData: string) {
+async function handleDeleteUser() {
   try {
-    const response = await axiosInstance.delete(userEndpoint.deleteUser, {
-      headers: { "Content-Type": "application/json" },
-      data: userData,
-    });
+    const response = await axiosInstance.delete(
+      "/auth" + userEndpoint.deleteUser
+    );
     return response.data;
   } catch (err: any) {
     console.error(err.message);

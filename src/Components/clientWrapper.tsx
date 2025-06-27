@@ -12,7 +12,6 @@ import SideBar from "./sideBar";
 import { useEffect, useState } from "react";
 import SplashScreen from "./splashScreen";
 
-// 🔔 Toastify imports
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -72,6 +71,23 @@ export default function ClientWrapper({
         pauseOnFocusLoss
         draggable
         pauseOnHover
+        toastClassName={(context) => {
+          const toastType = context?.type;
+          return `rounded-lg px-5 mb-2 flex item center  py-4 pl-2 shadow-md border text-sm ${
+            theme === "dark"
+              ? "bg-[#1E1F25] text-white border-gray-700"
+              : "bg-white text-gray-800 border-gray-200"
+          } ${
+            toastType === "success"
+              ? "border-green-500"
+              : toastType === "error"
+              ? "border-red-500"
+              : "border-blue-500"
+          }`;
+        }}
+        progressClassName={`!h-1 ${
+          theme === "dark" ? "bg-green-400" : "bg-green-500"
+        }`}
         theme={theme === "dark" ? "dark" : "light"}
       />
 

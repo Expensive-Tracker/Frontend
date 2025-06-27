@@ -154,7 +154,7 @@ const Analysis = () => {
       ].filter((result) => result.status === "rejected");
 
       if (failedCalls.length === 3) {
-        showErrorToast("Something went worng");
+        showErrorToast("Something went wrong");
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {

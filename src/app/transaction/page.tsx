@@ -112,7 +112,6 @@ const TransactionTable = () => {
     }
   }
   const fetchTransactionList = useCallback(async () => {
-    // setLoading(false);
     try {
       const response = await handleGetTransaction(
         pagination.page,

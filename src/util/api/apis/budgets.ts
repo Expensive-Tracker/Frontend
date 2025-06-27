@@ -13,7 +13,7 @@ export async function handleAddBudget(body: any) {
     );
     return response.data;
   } catch (err: any) {
-    showErrorToast("Something went wrong");
+    showErrorToast(err?.response?.data?.message);
     console.error(err?.message);
   }
 }
@@ -45,7 +45,7 @@ export async function getSpecificSubBudget(
     );
     return response.data;
   } catch (err: any) {
-    showErrorToast("Something went wrong");
+    showErrorToast(err?.response?.data?.message);
     console.error(err?.message);
   }
 }
@@ -81,7 +81,7 @@ export async function handleEditSubBudget(
     );
     return response.data;
   } catch (err: any) {
-    showErrorToast("Something went wrong");
+    showErrorToast(err?.response?.data?.message);
     console.error(err?.message);
   }
 }
@@ -95,7 +95,7 @@ export async function handleDeleteCategory(id: string, subId: string) {
     );
     return response.data;
   } catch (err: any) {
-    showErrorToast("Something went wrong");
+    showErrorToast(err?.response?.data?.message);
     console.error(err?.message);
   }
 }

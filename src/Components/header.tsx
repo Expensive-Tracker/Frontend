@@ -107,13 +107,16 @@ function Header() {
                 onClick={handleShowUserMenu}
               >
                 {userData?.profilePic ? (
-                  <Image
-                    src={userData?.profilePic}
-                    className="object-cover rounded-4xl w-8 h-8"
-                    alt="Avatar"
-                    width={32}
-                    height={32}
-                  />
+                  <div className="w-8 h-8 relative rounded-full overflow-hidden">
+                    <Image
+                      src={userData?.profilePic}
+                      alt="Avatar"
+                      fill
+                      className="object-cover"
+                      sizes="32px"
+                      priority
+                    />
+                  </div>
                 ) : (
                   <RxAvatar className="w-8 h-8" />
                 )}

@@ -10,7 +10,8 @@ export async function handleGetSummary() {
     const response = await axiosInstance.get(analyticsEndpoints.totalIncome);
     return response.data;
   } catch (err: any) {
-    showErrorToast(err?.message);
+    if (err?.status === 404) return;
+    showErrorToast(err?.response?.data?.message);
   }
 }
 
@@ -21,7 +22,8 @@ export async function handleGetCategoryBreakDown() {
     );
     return response.data;
   } catch (err: any) {
-    showErrorToast(err?.message);
+    console.error(err?.response?.data?.message);
+    showErrorToast(err?.response?.data?.message);
   }
 }
 
@@ -30,6 +32,6 @@ export async function handleGetMonthlyTrends() {
     const response = await axiosInstance.get(analyticsEndpoints.monthlyTrends);
     return response.data;
   } catch (err: any) {
-    showErrorToast(err?.message);
+    showErrorToast(err?.response?.data?.message);
   }
 }

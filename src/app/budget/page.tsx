@@ -52,8 +52,8 @@ const Budgets = () => {
   }
 
   function handleAddModelDetail() {
-    setModalDetail((pre) => ({
-      ...pre,
+    setModalDetail(() => ({
+      transactionId: "",
       id: "add_subBudget",
     }));
     dispatch(handleOpenAndCloseModal());

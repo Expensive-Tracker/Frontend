@@ -18,7 +18,10 @@ import {
   handleGetSpecificTransaction,
   handleUpdateTransaction,
 } from "@/util/api/apis/transaction";
-import { budgetSchemaMain } from "@/util/validation/budgetValidation";
+import {
+  budgetSchemaMain,
+  FormValueMain,
+} from "@/util/validation/budgetValidation";
 import {
   getSpecificSubBudget,
   handleCreateSubBudget,
@@ -39,6 +42,7 @@ import { handleSetBudget } from "@/store/slice/budgetSlice";
 import { handleDeleteUser, handleUpdateUser } from "@/util/api/apis/userApi";
 import { userEditSchema } from "@/util/validation/userValidation";
 import { RxAvatar } from "react-icons/rx";
+import { redirect } from "next/navigation";
 
 const transactionType = ["Select Transaction Type", "Income", "Expense"];
 export const categories = [
@@ -53,9 +57,7 @@ export const categories = [
 const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
   // hooks
   const dispatch = useDispatch();
-  const userDetail = useSelector(
-    (state: RootState) => state.user.userDetail._id
-  );
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageChanged, setImageChanged] = useState(false);
   const actualUserDetail = useSelector(
@@ -73,6 +75,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
   const transactionExits = useSelector(
     (state: RootState) => state.user.isNew.remain
   );
+
   const updatedCategory =
     budgetCategory?.length ?? 0 > 0
       ? categories.filter(
@@ -159,7 +162,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
     getValues,
     formState: { errors, isDirty },
     watch,
-  } = useForm({
+  } = useForm<FormValueMain>({
     defaultValues: {
       budget: undefined,
       category: "",
@@ -260,10 +263,12 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
       dispatch(handleOpenAndCloseModal());
       setIsSubmitting(false);
       showSuccessToast("Created successfully");
+      reset({ category: "", budget: undefined });
     } catch (err: any) {
       showErrorToast("Something went wrong");
       console.error(err);
       setIsSubmitting(false);
+      reset({ category: "", budget: undefined });
     }
   }
 
@@ -272,18 +277,27 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
   async function handleBudgetEdit() {
     setIsSubmitting(true);
     try {
-      const data = getValues();
-      const payload = {
-        subBudgetAmount: Number(data.budget),
-      };
-      await handleEditSubBudget(budgetId, transactionId, payload);
+      const newData = getValues();
+      const changed: Record<string, any> = {};
+
+      if (Number(newData.budget) !== Number(editDetail.amount)) {
+        changed.subBudgetAmount = Number(newData.budget);
+      }
+
+      if (Object.keys(changed).length === 0) {
+        showErrorToast("No changes detected.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      await handleEditSubBudget(budgetId, transactionId, changed);
       dispatch(handleRefetch());
       dispatch(handleOpenAndCloseModal());
-      setIsSubmitting(false);
       showSuccessToast("Updated successfully");
     } catch (err: any) {
-      showErrorToast("Something went wrong");
       console.error(err?.message);
+      showErrorToast("Something went wrong");
+    } finally {
       setIsSubmitting(false);
     }
   }
@@ -291,17 +305,29 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
   const handleEditTransaction = async () => {
     setIsSubmitting(true);
     try {
-      const data = getTransactionValue();
-      data.type.toLowerCase();
-      data.category.toLowerCase();
-      await handleUpdateTransaction(transactionId, data);
+      const newData = getTransactionValue();
+
+      const updatedFields: Record<string, any> = {};
+      Object.entries(newData).forEach(([key, value]) => {
+        if (value !== (editDetail as any)[key]) {
+          updatedFields[key] = value;
+        }
+      });
+
+      if (Object.keys(updatedFields).length === 0) {
+        showErrorToast("No changes detected.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      await handleUpdateTransaction(transactionId, updatedFields);
       dispatch(handleRefetch());
       dispatch(handleOpenAndCloseModal());
-      setIsSubmitting(false);
       showSuccessToast("Updated successfully");
     } catch (err: any) {
+      console.error(err.message);
       showErrorToast("Something went wrong");
-      console.error(err?.message);
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -309,21 +335,29 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
   const handleUpdateUserSubmit = async () => {
     setIsSubmitting(true);
     const data = getUserValue();
+    const formData = new FormData();
+
+    if (data.username !== actualUserDetail.username) {
+      formData.append("username", data.username);
+    }
+
+    if (data.email !== actualUserDetail.email) {
+      formData.append("email", data.email);
+    }
+
+    if (fileData && imageChanged) {
+      formData.append("profilePic", fileData);
+    }
+
+    if ([...formData.keys()].length === 0) {
+      showErrorToast("No changes detected.");
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
-      const formData = new FormData();
-      formData.append("username", data.username);
-      formData.append("email", data.email);
-
-      if (fileData) {
-        formData.append("profilePic", fileData);
-      }
-
       const result = await handleUpdateUser(formData);
-
-      if (!result) {
-        throw new Error(result?.message);
-      }
+      if (!result) throw new Error(result?.message);
 
       resetUser({
         username: result.username || data.username,
@@ -336,12 +370,12 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
 
       dispatch(handleChangeUserData(result?.data));
       dispatch(handleOpenAndCloseModal());
-      setFileData(null);
-      setIsSubmitting(false);
       showSuccessToast("Updated successfully");
+      setFileData(null);
     } catch (error: any) {
       console.error("Error updating user:", error);
       showErrorToast("Something went wrong");
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -381,12 +415,14 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
   const handleDeleteUsers = async () => {
     setIsSubmitting(true);
     try {
-      await handleDeleteUser(userDetail);
-      dispatch(handleOpenAndCloseModal());
+      await handleDeleteUser();
       dispatch(handleUserSignOut());
       dispatch(handleSetNewFalse());
       setIsSubmitting(false);
       showSuccessToast("Deleted successfully");
+      localStorage.clear();
+      dispatch(handleOpenAndCloseModal());
+      redirect("/auth/signin");
     } catch (err: any) {
       showErrorToast("Something went wrong");
       console.error(err?.message);
@@ -424,7 +460,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
   const handleCancel = () => {
     resetTransaction();
     resetUser();
-    reset();
+    reset({ category: "", budget: undefined });
     dispatch(handleOpenAndCloseModal());
   };
 

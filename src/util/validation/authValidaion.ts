@@ -44,9 +44,7 @@ export const passwordValidationSchema = object({
   password: string()
     .required("password is required")
     .min(8, "Minimum 8 character is required")
-    .max(20, "Maximum 20 character is required")
-    .matches(/[a-z]/, "Password must contain at least one lowercase letter")
-    .matches(/[A-Z]/, "Password must contain at least one uppercase letter"),
+    .max(20, "Maximum 20 character is required"),
   confirmPassword: string()
     .required("confirm password is required")
     .oneOf([ref("password")], "passwords dose not match"),

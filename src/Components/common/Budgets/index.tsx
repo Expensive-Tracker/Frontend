@@ -242,7 +242,6 @@ const BudgetArea = ({ handleModelOpen, setIsLoading, loading }: props) => {
       if (err?.response?.status === 404) {
         dispatch(handleSetRemainTrue("budgets"));
         setHasBudget(false);
-        console.log("No budget found - 404");
       } else {
         console.error("Error fetching user budget:", err?.message);
       }

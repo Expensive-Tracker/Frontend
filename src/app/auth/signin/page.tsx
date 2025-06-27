@@ -15,7 +15,6 @@ import {
   handleChangeSplashFlag,
   handleShowSplashScreen,
 } from "@/store/slice/uiSlice";
-import { showSuccessToast } from "@/util/services/toast";
 
 function Login() {
   const dispatch = useDispatch();
@@ -54,7 +53,6 @@ function Login() {
       dispatch(handleChangeSplashFlag());
       dispatch(handleShowSplashScreen());
       setTimeout(() => {
-        showSuccessToast("Login successful");
         redirect("/");
       }, 1000);
     } else {

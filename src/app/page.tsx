@@ -6,6 +6,7 @@ import ChartSkeleton from "@/components/common/skeletion/chartSkeletion";
 import SummaryCardSkeleton from "@/components/common/skeletion/summryCardSkeletion";
 import TableSkeleton from "@/components/common/skeletion/tableSkeletion";
 import SummaryCards from "@/components/common/summaryCard";
+import { handleSetRemainTrue } from "@/store/slice/userSlice";
 import { RootState } from "@/store/store";
 import {
   handleGetSummary,
@@ -15,12 +16,13 @@ import { handleGetTransaction } from "@/util/api/apis/transaction";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FaPlus, FaWallet } from "react-icons/fa";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function Home() {
   const isNew = useSelector((state: RootState) => state.user.isNew.remain);
   const userId = useSelector((state: RootState) => state.user.userDetail._id);
   const theme = useSelector((state: RootState) => state.theme.theme);
+  const dispatch = useDispatch();
 
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({
@@ -88,6 +90,9 @@ export default function Home() {
         }));
       }
     } catch (err: any) {
+      if (err?.status === 404) {
+        dispatch(handleSetRemainTrue("budgets"));
+      }
       console.error(err?.message);
     }
   }
@@ -103,7 +108,8 @@ export default function Home() {
         }));
       }
     } catch (err: any) {
-      console.log(err?.message);
+      if (err?.status === 404) dispatch(handleSetRemainTrue("transaction"));
+      console.error(err?.message);
     }
   }
 
@@ -218,11 +224,19 @@ export default function Home() {
           colors={["#10B981", "#EF4444"]}
           options={{
             labels: pieChartLabels,
+            legend: {
+              position: "bottom",
+              fontSize: "14px",
+              labels: {
+                colors: theme === "dark" ? "#D1D5DB" : "#374151",
+              },
+            },
           }}
           className={`w-full p-4 rounded-lg border ${
             theme === "dark" ? "bg-[#27282E]/20" : "bg-white border-gray-200"
           } shadow-sm  `}
         />
+
         {data.categoryData.length > 0 ? (
           <DynamicChart
             type="bar"
