@@ -9,6 +9,10 @@ import {
   handleGetMonthlyTrends,
 } from "@/util/api/apis/analytics";
 import ChartSkeleton from "@/components/common/skeletion/chartSkeletion";
+import SummaryCards from "@/components/common/summaryCard";
+import Link from "next/link";
+import { FaPlus, FaWallet } from "react-icons/fa";
+import { showErrorToast } from "@/util/services/toast";
 
 const LoadingAnalysis = ({ theme }: { theme: string }) => {
   return (
@@ -20,7 +24,6 @@ const LoadingAnalysis = ({ theme }: { theme: string }) => {
   );
 };
 
-// Empty State Component
 const EmptyState = ({
   theme,
   title,
@@ -30,7 +33,7 @@ const EmptyState = ({
   theme: string;
   title: string;
   description: string;
-  icon: string;
+  icon?: string;
 }) => {
   const textPrimary = theme === "dark" ? "text-white" : "text-gray-900";
   const textSecondary = theme === "dark" ? "text-gray-300" : "text-gray-600";
@@ -56,7 +59,7 @@ const EmptyState = ({
 
 const Analysis = () => {
   const theme = useSelector((state: RootState) => state.theme.theme);
-
+  const isNew = useSelector((state: RootState) => state.user.isNew.remain);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({
     monthlyTrends: {
@@ -75,16 +78,18 @@ const Analysis = () => {
     },
   });
 
-  const [error, setError] = useState<string | null>(null);
-
   useEffect(() => {
     fetchAnalyticsData();
   }, []);
 
+  const hover =
+    theme === "dark"
+      ? "hover:text-white hover:bg-black border border-white/20"
+      : "hover:bg-[#27282E] border border-[#1B1C21] hover:text-white";
+
   const fetchAnalyticsData = async () => {
     try {
       setLoading(true);
-      setError(null);
 
       const [monthlyTrendsResult, categoryResult, summaryResult] =
         await Promise.allSettled([
@@ -149,12 +154,11 @@ const Analysis = () => {
       ].filter((result) => result.status === "rejected");
 
       if (failedCalls.length === 3) {
-        setError("Failed to load analytics data. Please try again later.");
+        showErrorToast("Something went worng");
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Error fetching analytics data:", err);
-      setError("An unexpected error occurred while loading analytics data.");
     } finally {
       setLoading(false);
     }
@@ -178,40 +182,61 @@ const Analysis = () => {
     return <LoadingAnalysis theme={theme} />;
   }
 
-  if (error) {
+  if (isNew.budgets || isNew.transaction)
     return (
-      <div className="p-4 py-6">
+      <div
+        className={`w-full flex items-center justify-center flex-col gap-4 p-8 rounded-xl ${textPrimary}`}
+      >
         <div
-          className={`flex flex-col items-center justify-center min-h-96 p-8 rounded-lg ${
-            theme === "dark"
-              ? "bg-gray-800/50 text-gray-300"
-              : "bg-white text-gray-600"
-          } shadow-sm border ${
-            theme === "dark" ? "border-gray-700" : "border-gray-200"
+          className={`p-4 rounded-full ${
+            theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"
           }`}
         >
-          <div className="text-center">
-            <h3 className={`text-lg font-semibold mb-2 ${textPrimary}`}>
-              Unable to Load Analytics
-            </h3>
-            <p className={`mb-4 ${textSecondary}`}>{error}</p>
-            <button
-              onClick={fetchAnalyticsData}
-              className={`px-4 py-2 rounded-md transition-colors ${
-                theme === "dark"
-                  ? "bg-blue-600 hover:bg-blue-700 text-white"
-                  : "bg-blue-500 hover:bg-blue-600 text-white"
-              }`}
+          <FaWallet
+            className={`text-3xl ${
+              theme === "dark" ? "text-blue-400" : "text-blue-600"
+            }`}
+          />
+        </div>
+
+        <div className="text-center">
+          <h3 className={`text-lg font-semibold mb-2 ${textPrimary}`}>
+            {isNew.budgets && isNew.transaction
+              ? "No Budget and Transactions Found"
+              : isNew.budgets
+              ? "No Budget Found"
+              : "No Transaction Found"}
+          </h3>
+          <p className={`mb-4 ${textSecondary}`}>
+            {isNew.budgets && isNew.transaction
+              ? "Add a budget and your first transaction to start tracking your expenses."
+              : isNew.budgets
+              ? "Add a budget to begin managing your spending limits."
+              : "Add a transaction to start tracking your expenses."}
+          </p>
+          <div className="flex items-center justify-center">
+            <Link
+              href={
+                isNew.budgets && isNew.transaction
+                  ? "/budget"
+                  : isNew.budgets
+                  ? "/budget"
+                  : "/transaction"
+              }
+              className={`flex items-center justify-center w-fit gap-2 px-2.5 py-1.5 cursor-pointer transition-all rounded-md ${hover}`}
             >
-              Retry
-            </button>
+              <FaPlus /> Add{" "}
+              {isNew.budgets && isNew.transaction
+                ? "Budget"
+                : isNew.budgets
+                ? "Budget"
+                : "Transaction"}
+            </Link>
           </div>
         </div>
       </div>
     );
-  }
 
-  // If no data at all, show empty state
   if (!hasMonthlyData && !hasCategoryData && !hasSummaryData) {
     return (
       <div className="p-4 py-6">
@@ -227,70 +252,24 @@ const Analysis = () => {
 
   return (
     <div className="p-4 py-6 space-y-8">
-      {/* Monthly Expense Trend (Line Chart) */}
       {hasSummaryData ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div
-            className={`p-6 rounded-lg ${
-              theme === "dark" ? "bg-gray-800/50" : "bg-white"
-            } shadow-sm border ${
-              theme === "dark" ? "border-gray-700" : "border-gray-200"
-            }`}
-          >
-            <h4 className={`text-sm font-medium ${textSecondary} mb-1`}>
-              Total Income
-            </h4>
-            <p className={`text-2xl font-bold text-green-500`}>
-              ₹{data.summary.totalIncome.toLocaleString()}
-            </p>
-          </div>
-
-          <div
-            className={`p-6 rounded-lg ${
-              theme === "dark" ? "bg-gray-800/50" : "bg-white"
-            } shadow-sm border ${
-              theme === "dark" ? "border-gray-700" : "border-gray-200"
-            }`}
-          >
-            <h4 className={`text-sm font-medium ${textSecondary} mb-1`}>
-              Total Expenses
-            </h4>
-            <p className={`text-2xl font-bold text-red-500`}>
-              ₹{data.summary.totalExpenses.toLocaleString()}
-            </p>
-          </div>
-
-          <div
-            className={`p-6 rounded-lg ${
-              theme === "dark" ? "bg-gray-800/50" : "bg-white"
-            } shadow-sm border ${
-              theme === "dark" ? "border-gray-700" : "border-gray-200"
-            }`}
-          >
-            <h4 className={`text-sm font-medium ${textSecondary} mb-1`}>
-              Net Balance
-            </h4>
-            <p
-              className={`text-2xl font-bold ${
-                data.summary.balance >= 0 ? "text-green-500" : "text-red-500"
-              }`}
-            >
-              ₹{data.summary.balance.toLocaleString()}
-            </p>
-          </div>
-        </div>
+        <SummaryCards
+          totalIncome={data.summary.totalIncome}
+          totalExpenses={data.summary.totalExpenses}
+          balance={data.summary.balance}
+          theme={theme}
+        />
       ) : (
         <EmptyState
           theme={theme}
           title="No Summary Data"
           description="Add income and expense transactions to see your financial summary."
-          icon="💰"
         />
       )}
       {hasMonthlyData ? (
         <DynamicChart
           type="line"
-          title="📆 Monthly Expense Trend"
+          title="Monthly Expense Trend"
           subtitle="Tracks expenses & income over selected months"
           series={[
             {
@@ -315,26 +294,22 @@ const Analysis = () => {
             },
           }}
           colors={["#4ade80", "#f87171"]}
-          className={`w-full p-6 rounded-lg ${
-            theme === "dark" ? "bg-gray-800/50" : "bg-white"
-          } shadow-sm border ${
-            theme === "dark" ? "border-gray-700" : "border-gray-200"
-          }`}
+          className={`w-full p-6 rounded-lg border ${
+            theme === "dark" ? "bg-[#27282E]/20" : "bg-white border-gray-200"
+          } shadow-sm `}
         />
       ) : (
         <EmptyState
           theme={theme}
           title="No Monthly Trend Data"
           description="Add transactions across different months to see your income and expense trends."
-          icon="📈"
         />
       )}
 
-      {/* Expense Breakdown by Category (Pie Chart) */}
       {hasCategoryData ? (
         <DynamicChart
           type="pie"
-          title="🥧 Expense Breakdown by Category"
+          title="Expense Breakdown by Category"
           subtitle="Shows percentage split of expenses across categories"
           series={data.categoryBreakdown.series}
           options={{
@@ -344,26 +319,22 @@ const Analysis = () => {
             },
           }}
           colors={["#6366f1", "#f59e0b", "#10b981", "#ec4899", "#f97316"]}
-          className={`w-full p-6 rounded-lg ${
-            theme === "dark" ? "bg-gray-800/50" : "bg-white"
-          } shadow-sm border ${
-            theme === "dark" ? "border-gray-700" : "border-gray-200"
-          }`}
+          className={`w-full p-6 rounded-lg border ${
+            theme === "dark" ? "bg-[#27282E]/20" : "bg-white border-gray-200"
+          } shadow-sm `}
         />
       ) : (
         <EmptyState
           theme={theme}
           title="No Category Data Available"
           description="Add expense transactions with different categories to see the breakdown."
-          icon="🥧"
         />
       )}
 
-      {/* Income vs. Expense Comparison (Bar Chart) */}
       {hasMonthlyData ? (
         <DynamicChart
           type="bar"
-          title="📊 Income vs. Expense Comparison"
+          title="Income vs. Expense Comparison"
           subtitle="Compares total income and expenses per month"
           series={[
             {
@@ -389,18 +360,15 @@ const Analysis = () => {
             },
           }}
           colors={["#60a5fa", "#f87171"]}
-          className={`w-full p-6 rounded-lg ${
-            theme === "dark" ? "bg-gray-800/50" : "bg-white"
-          } shadow-sm border ${
-            theme === "dark" ? "border-gray-700" : "border-gray-200"
-          }`}
+          className={`w-full p-6 rounded-lg border ${
+            theme === "dark" ? "bg-[#27282E]/20" : "bg-white border-gray-200"
+          } shadow-sm `}
         />
       ) : (
         <EmptyState
           theme={theme}
           title="No Comparison Data"
           description="Add income and expense data to see monthly comparisons."
-          icon="📊"
         />
       )}
 

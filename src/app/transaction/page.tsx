@@ -25,7 +25,10 @@ import { handleGetTransaction } from "@/util/api/apis/transaction";
 import Modal, { categories } from "@/components/common/modal/modal";
 import { handleOpenAndCloseModal, handleRefetch } from "@/store/slice/uiSlice";
 import Text from "@/components/common/text/text";
-import { handleSetRemainTrue } from "@/store/slice/userSlice";
+import {
+  handleSetRemainFalse,
+  handleSetRemainTrue,
+} from "@/store/slice/userSlice";
 
 const TransactionTable = () => {
   const theme = useSelector((state: RootState) => state.theme.theme);
@@ -35,8 +38,9 @@ const TransactionTable = () => {
   const transactionExits = useSelector(
     (state: RootState) => state.user.isNew.remain.transaction
   );
+
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [data, setData] = useState<Transaction[]>();
+  const [data, setData] = useState<Transaction[]>([]);
   const [showFilter, setShowFilter] = useState<boolean>(false);
   const [modalDetail, setModalDetail] = useState<{
     modalId: string;
@@ -68,6 +72,7 @@ const TransactionTable = () => {
 
   useEffect(() => {
     if (refetch) dispatch(handleRefetch());
+
     setLoading(true);
     const delayDebounce = setTimeout(() => {
       fetchTransactionList();
@@ -107,6 +112,7 @@ const TransactionTable = () => {
     }
   }
   const fetchTransactionList = useCallback(async () => {
+    // setLoading(false);
     try {
       const response = await handleGetTransaction(
         pagination.page,
@@ -123,6 +129,8 @@ const TransactionTable = () => {
           },
         }
       );
+      if (response.result.data.transactions)
+        dispatch(handleSetRemainFalse("transaction"));
       setData(response.result.data.transactions);
       setPagination((prev) => ({
         ...prev,

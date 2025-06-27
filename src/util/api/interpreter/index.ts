@@ -4,7 +4,7 @@ import axios from "axios";
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BASE_API_URL,
-  timeout: 1000,
+  timeout: 5000,
   headers: { "Content-Type": "application/json" },
 });
 
@@ -29,8 +29,10 @@ axiosInstance.interceptors.response.use(
   function (err: any) {
     if (err.response && err.response.status === 401) {
       localStorage.removeItem("authToken");
-      window.location.replace("/auth/signin");
       store.dispatch(handleUserSignOut());
+      if (typeof window !== "undefined") {
+        window.location.href = "/auth/signin";
+      }
     }
     return Promise.reject(err);
   }

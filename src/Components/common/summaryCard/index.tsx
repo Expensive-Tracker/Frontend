@@ -46,7 +46,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
   const cards = [
     {
       title: "Total Income",
-      value: totalIncome,
+      value: totalIncome || 0,
       icon: IoIosArrowRoundUp,
       iconBg: incomeIconBg,
       iconColor: incomeColor,
@@ -54,7 +54,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
     },
     {
       title: "Total Expenses",
-      value: totalExpenses,
+      value: totalExpenses || 0,
       icon: IoIosArrowRoundDown,
       iconBg: expenseIconBg,
       iconColor: expenseColor,
@@ -62,7 +62,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
     },
     {
       title: "Current Balance",
-      value: balance,
+      value: balance || 0,
       icon: FaWallet,
       iconBg: balanceIconBg,
       iconColor: balanceColor,
@@ -77,7 +77,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
         return (
           <div
             key={index}
-            className={`p-6 rounded-xl flex-1 w-full ${cardBg} transition-all duration-200 shadow-lg`}
+            className={`p-6 rounded-xl flex-1 w-full border ${cardBg} transition-all duration-200 shadow-lg`}
           >
             <div className="flex items-center justify-between mb-4">
               <div className={`p-3 rounded-full ${card.iconBg}`}>

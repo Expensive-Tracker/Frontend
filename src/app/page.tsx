@@ -219,8 +219,8 @@ export default function Home() {
           options={{
             labels: pieChartLabels,
           }}
-          className={`w-full p-4 rounded-lg ${
-            theme === "dark" ? "bg-[#27282E]/20" : "bg-white"
+          className={`w-full p-4 rounded-lg border ${
+            theme === "dark" ? "bg-[#27282E]/20" : "bg-white border-gray-200"
           } shadow-sm  `}
         />
         {data.categoryData.length > 0 ? (
@@ -244,8 +244,8 @@ export default function Home() {
                 categories: data.categoryData.map((item: any) => item.name),
               },
             }}
-            className={`w-full p-4 rounded-lg xl:col-span-2 ${
-              theme === "dark" ? "bg-[#27282E]/20" : "bg-white"
+            className={`w-full p-4 rounded-lg xl:col-span-2 border ${
+              theme === "dark" ? "bg-[#27282E]/20" : "bg-white border-gray-200"
             } shadow-sm `}
           />
         ) : (
@@ -270,11 +270,11 @@ export default function Home() {
 
       {data.transactionData.length > 0 && (
         <div
-          className={`p-4 m-4 rounded-xl ${
-            theme === "dark" ? "bg-[#27282E]/20" : "bg-gray-100"
+          className={`p-4 m-4 rounded-xl border ${
+            theme === "dark" ? "bg-[#27282E]/20" : "bg-gray-100 border-gray-200"
           }  shadow-sm`}
         >
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-between  items-center mb-6">
             <h3 className={`text-lg font-semibold ${textPrimary}`}>
               Recent Activity
             </h3>

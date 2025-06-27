@@ -1,7 +1,7 @@
 const SummaryCardSkeleton = ({ theme }: { theme: string }) => {
-  const cardBg = theme === "dark" ? "bg-gray-800/50" : "bg-white";
-  const skeletonBg = theme === "dark" ? "bg-gray-700" : "bg-gray-300";
-  const skeletonBgSecondary = theme === "dark" ? "bg-gray-600" : "bg-gray-200";
+  const cardBg = theme === "dark" ? "bg-[#27282E]/50" : "bg-white";
+  const skeletonBg = theme === "dark" ? "bg-[#27282E]" : "bg-gray-300";
+  const skeletonBgSecondary = theme === "dark" ? "bg-[#27282E]" : "bg-gray-200";
 
   return (
     <div

@@ -4,6 +4,7 @@ import { userSliceState } from "@/util/interface/slice";
 import axios from "axios";
 import axiosInstance from "../interpreter";
 import endpoints from "@/util/constant/endpoint";
+import { showErrorToast } from "@/util/services/toast";
 
 const URL = process.env.NEXT_PUBLIC_BASE_API_URL + "auth" || "";
 const userEndpoint = endpoints.user;
@@ -35,18 +36,19 @@ async function handleRegister(userData: FormData) {
   }
 }
 
-async function handleUpdateUser(userData: Partial<userSliceState>) {
+async function handleUpdateUser(userData: FormData) {
   try {
     const response = await axiosInstance.put(
       userEndpoint.updProfile,
       userData,
       {
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "multipart/form-data" },
       }
     );
     return response.data;
   } catch (err: any) {
-    console.error(err.message);
+    showErrorToast(err?.response?.data?.message);
+    console.error(err?.response?.data?.message);
   }
 }
 
@@ -65,7 +67,7 @@ async function handleChangePassword(userData: Partial<userSliceState>) {
   }
 }
 
-async function handleDeleteUser(userData: Partial<userSliceState>) {
+async function handleDeleteUser(userData: string) {
   try {
     const response = await axiosInstance.delete(userEndpoint.deleteUser, {
       headers: { "Content-Type": "application/json" },

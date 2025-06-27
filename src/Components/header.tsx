@@ -8,17 +8,23 @@ import { useState, useEffect, useRef } from "react";
 import { CiLogout } from "react-icons/ci";
 import { MdOutlineWbSunny } from "react-icons/md";
 import { handleUserSignOut } from "@/store/slice/userSlice";
-import { redirect } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { HiOutlineMenuAlt1 } from "react-icons/hi";
 import { handleMobileMenuOpen } from "@/store/slice/uiSlice";
 import Text from "./common/text/text";
 import { BiWalletAlt } from "react-icons/bi";
+import Link from "next/link";
+import Image from "next/image";
+import { showSuccessToast } from "@/util/services/toast";
 
 function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState<boolean>(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const userData = useSelector((state: RootState) => state.user.userDetail);
   const theme = useSelector((state: RootState) => state.theme.theme);
+  const pathname = usePathname();
+  const isProfilePage = pathname.includes("/profile");
+
   const dispatch = useDispatch();
 
   function handleShowUserMenu() {
@@ -31,10 +37,8 @@ function Header() {
 
   function handleLogOut() {
     dispatch(handleUserSignOut());
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("OtpToken");
-    localStorage.removeItem("email");
-    localStorage.removeItem("correctOtpToken");
+    localStorage.clear();
+    showSuccessToast("Logout successful ");
     redirect("/auth/signin");
   }
 
@@ -56,7 +60,7 @@ function Header() {
 
   return (
     <header
-      className={`w-full fixed top-0 z-50 border-b border-b-[#27282E] flex items-center lg:justify-end justify-between px-6 py-3 shadow ${
+      className={`w-full fixed top-0 z-50 border-b border-b-[#27282E] flex items-center lg:justify-end justify-between px-6 py-3 shadow  ${
         theme === "dark" ? "bg-[#1B1C21]" : "bg-white"
       }`}
     >
@@ -73,7 +77,7 @@ function Header() {
           <Text Element="p" text="Tracker" style="font-light -mt-1.5" isDes />
         </div>
       </div>
-      <div className="flex items-center gap-4 ">
+      <div className={`flex items-center gap-4 ${isProfilePage ? "py-1" : ""}`}>
         {theme === "dark" ? (
           <MdOutlineWbSunny
             size={24}
@@ -87,43 +91,66 @@ function Header() {
             onClick={handleChangeTheme}
           />
         )}
-
-        <div ref={userMenuRef} className="relative cursor-pointer">
-          <div
-            className="flex items-center gap-1.5"
-            onClick={handleShowUserMenu}
+        {isProfilePage ? (
+          <p
+            className="flex items-center gap-2 cursor-pointer"
+            onClick={handleLogOut}
           >
-            {userData?.profilePic ? (
-              <img
-                src={userData?.profilePic}
-                className="object-cover rounded-4xl w-8 h-8"
-                alt="Avatar"
-              />
-            ) : (
-              <RxAvatar className="w-8 h-8" />
-            )}
+            <CiLogout scale={18} />
+            Log out
+          </p>
+        ) : (
+          <>
+            <div ref={userMenuRef} className="relative cursor-pointer">
+              <div
+                className="flex items-center gap-1.5"
+                onClick={handleShowUserMenu}
+              >
+                {userData?.profilePic ? (
+                  <Image
+                    src={userData?.profilePic}
+                    className="object-cover rounded-4xl w-8 h-8"
+                    alt="Avatar"
+                    width={32}
+                    height={32}
+                  />
+                ) : (
+                  <RxAvatar className="w-8 h-8" />
+                )}
 
-            <span className="hidden lg:inline ">{userData.username}</span>
-            <IoIosArrowDown />
-          </div>
-          <div
-            className={`absolute md:left-0 left-[-80px] top-[42px] md:top-[37px] z-10 w-[150px] rounded-b-md shadow-2xl px-8 py-3  flex-col items-start
+                <span className="hidden lg:inline ">{userData.username}</span>
+                <IoIosArrowDown />
+              </div>
+              <div
+                className={`absolute md:-left-2 left-[-80px] top-[42px] md:top-[45px] z-10 w-[150px] rounded-b-md shadow-2xl px-8 py-3  flex-col items-start
               transition-all duration-300 ease-in-out transform origin-top   ${
                 userMenuOpen
                   ? "opacity-100 scale-100"
                   : "opacity-0 scale-95 pointer-events-none"
               } ${theme === "dark" ? "bg-black" : "bg-white"}`}
-          >
-            <p className="mt-2 flex items-center gap-2">
-              <RxAvatar size={18} />
-              Profile
-            </p>
-            <p className="mt-2 flex items-center gap-2" onClick={handleLogOut}>
-              <CiLogout scale={18} />
-              Log out
-            </p>
-          </div>
-        </div>
+              >
+                <Link
+                  href="/profile"
+                  className="mt-2 cursor-pointer flex items-center gap-2"
+                  onClick={handleShowUserMenu}
+                >
+                  <RxAvatar size={18} />
+                  Profile
+                </Link>
+                <p
+                  className="mt-2 flex items-center cursor-pointer gap-2"
+                  onClick={() => {
+                    handleLogOut();
+                    handleShowUserMenu();
+                  }}
+                >
+                  <CiLogout scale={18} />
+                  Log out
+                </p>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </header>
   );

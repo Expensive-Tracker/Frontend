@@ -76,7 +76,7 @@ const SideBar = () => {
           <div
             className={`absolute  ${
               uiData.isOpen || uiData.isHovered ? "top-[12px]" : "top-0"
-            } hidden -right-6 lg:block cursor-pointer z-50 transition-all p-2 shadow rounded-full ${
+            } hidden -right-4 lg:block cursor-pointer z-50 transition-all p-2 shadow rounded-full ${
               uiData.isOpen ? "rotate-0" : "rotate-180"
             } ${theme === "dark" ? "bg-[#27282E]" : "bg-white"} `}
             onClick={handleShowMenu}
@@ -152,7 +152,7 @@ const SideBar = () => {
                 const isExpanded = uiData.isOpen || uiData.isHovered;
                 const isActive = pathname === item.path;
 
-                const commonClasses = `flex items-center gap-2 text-base focus:outline-none ${
+                const commonClasses = `flex items-center w-full gap-2 text-base focus:outline-none ${
                   isExpanded ? "py-3 px-3" : "py-3 px-2"
                 } rounded-md transition-all cursor-pointer w-full ${
                   isActive
@@ -166,10 +166,14 @@ const SideBar = () => {
 
                 if (isExpanded) {
                   return (
-                    <li key={item.id} className={commonClasses}>
+                    <Link
+                      href={item.path}
+                      key={item.id}
+                      className={commonClasses}
+                    >
                       <span className="!text-xl">{item.icon}</span>
-                      <Link href={item.path}>{item.navName}</Link>
-                    </li>
+                      <span>{item.navName}</span>
+                    </Link>
                   );
                 } else {
                   return (

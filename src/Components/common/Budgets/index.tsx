@@ -26,7 +26,7 @@ import { MdDelete } from "react-icons/md";
 import { handleRefetch } from "@/store/slice/uiSlice";
 import Button from "../button/button";
 import { BiLineChartDown } from "react-icons/bi";
-import { showErrorToast } from "@/util/services/toast";
+import { showErrorToast, showSuccessToast } from "@/util/services/toast";
 
 interface props {
   handleModelOpen: (id: string) => void;
@@ -279,6 +279,7 @@ const BudgetArea = ({ handleModelOpen, setIsLoading, loading }: props) => {
           dispatch(handleSetBudget(result.budget));
           setEdit(false);
           setHasBudget(true);
+          showSuccessToast("Updated successfully");
           reset({ budget: undefined });
         }
       } else {

@@ -16,10 +16,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/auth/signin/page.js"
     ],
-    "/analysis/page": [
+    "/budget/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/analysis/page.js"
+      "static/chunks/app/budget/page.js"
+    ],
+    "/transaction/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/transaction/page.js"
     ],
     "/_not-found/page": [
       "static/chunks/webpack.js",

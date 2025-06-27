@@ -1,8 +1,8 @@
 import TransactionSkeleton from "./transactionSkeleton";
 
 const TableSkeleton = ({ theme }: { theme: string }) => {
-  const containerBg = theme === "dark" ? "bg-gray-800/30" : "bg-gray-100";
-  const skeletonBg = theme === "dark" ? "bg-gray-700" : "bg-gray-300";
+  const skeletonBg = theme === "dark" ? "bg-[#27282E]" : "bg-gray-300";
+  const containerBg = theme === "dark" ? "bg-[#27282E]" : "bg-gray-200";
 
   return (
     <div
