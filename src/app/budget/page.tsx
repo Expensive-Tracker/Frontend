@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import BudgetArea from "@/components/common/Budgets";
 import Button from "@/components/common/button/button";
@@ -24,10 +25,20 @@ const Budgets = () => {
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const dispatch = useDispatch();
+  const [selectedMonth, setSelectedMonth] = useState<string>(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}`;
+  });
+  const [noBudgetHistory, seyNoBudgetHistory] = useState<boolean>(false);
   const theme = useSelector((state: RootState) => state.theme.theme);
   const budgetCategory = useSelector(
     (state: RootState) => state.budget.category ?? []
   );
+  const budget = useSelector((state: RootState) => state.budget);
+
   const budgetExits = useSelector(
     (state: RootState) => state.user.isNew.remain.budgets
   );
@@ -35,7 +46,7 @@ const Budgets = () => {
     (state: RootState) => state.uiSlice.modal.isOpen
   );
 
-  const bgColor = theme === "dark" ? "bg-zinc-900" : "bg-white";
+  const bgColor = theme === "dark" ? "bg-[#1B1C21]" : "bg-white";
   const textPrimary = theme === "dark" ? "text-white" : "text-gray-900";
   const textSecondary = theme === "dark" ? "text-gray-300" : "text-gray-600";
 
@@ -123,19 +134,44 @@ const Budgets = () => {
 
   return (
     <div className="p-4 py-6">
+      {budget.budgetAmount ? (
+        <div className="flex items-center gap-2 mb-4 flex-col sm:flex-row">
+          <label className={`${textSecondary} font-medium`} id="month">
+            Select Month:
+          </label>
+          <div className="w-full sm:w-auto">
+            <input
+              type="month"
+              id="month"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              max={new Date().toISOString().slice(0, 7)}
+              className={`rounded-md px-3 py-2 w-full sm:w-[200px] transition-all border border-gray-300 focus:outline-none ${
+                theme === "dark"
+                  ? "bg-[#1B1C21] text-white border-zinc-700 "
+                  : "bg-white text-gray-900"
+              }`}
+            />
+          </div>
+        </div>
+      ) : (
+        <></>
+      )}
+
       <BudgetArea
         handleModelOpen={handleAddModelDelete}
         setIsLoading={setIsLoading}
         loading={isLoading}
+        month={selectedMonth}
+        seyNoBudgetHistory={seyNoBudgetHistory}
       />
+
       <div className="md:mt-6 mt-3">
         {budgetCategory?.length <= 0 ? (
-          budgetExits ? (
-            <></>
-          ) : (
+          budgetExits ? null : (
             renderNoCategoriesSection()
           )
-        ) : (
+        ) : noBudgetHistory ? null : (
           <div>
             <div className="flex items-center mb-4 justify-between">
               <h2 className={`text-2xl font-semibold ${textPrimary}`}>
@@ -165,6 +201,7 @@ const Budgets = () => {
           </div>
         )}
       </div>
+
       {modelOpen && (
         <Modal id={modelDetail.id} transactionId={modelDetail.transactionId} />
       )}

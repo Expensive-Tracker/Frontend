@@ -42,7 +42,7 @@ import { handleSetBudget } from "@/store/slice/budgetSlice";
 import { handleDeleteUser, handleUpdateUser } from "@/util/api/apis/userApi";
 import { userEditSchema } from "@/util/validation/userValidation";
 import { RxAvatar } from "react-icons/rx";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const transactionType = ["Select Transaction Type", "Income", "Expense"];
 export const categories = [
@@ -57,6 +57,7 @@ export const categories = [
 const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
   // hooks
   const dispatch = useDispatch();
+  const route = useRouter();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageChanged, setImageChanged] = useState(false);
@@ -98,6 +99,26 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
   const theme = useSelector((state: RootState) => state.theme.theme);
   let modalContent;
   const isSubBudget = id.includes("subBudget");
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        dispatch(handleOpenAndCloseModal());
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "scroll";
+    };
+  });
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -142,7 +163,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
     formState: { errors: transactionError, isDirty: transactionIsDirty },
   } = useForm({
     defaultValues: {
-      amount: id === "edit" ? editDetail.amount : 0,
+      amount: id === "edit" ? editDetail.amount : undefined,
       category: id === "edit" ? editDetail.category : "",
       date:
         id === "edit"
@@ -422,7 +443,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
       showSuccessToast("Deleted successfully");
       localStorage.clear();
       dispatch(handleOpenAndCloseModal());
-      redirect("/auth/signin");
+      route.push("/auth/signin");
     } catch (err: any) {
       showErrorToast("Something went wrong");
       console.error(err?.message);
@@ -591,7 +612,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
             {/* Submit Button */}
             <div className="flex gap-2  justify-end">
               <button
-                className="px-4 py-2 bg-gray-100 rounded-md text-black cursor-pointer"
+                className="px-4 py-2  bg-gray-100 rounded-md text-black cursor-pointer"
                 onClick={handleCancel}
                 disabled={isSubmitting}
               >
@@ -599,9 +620,34 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
               </button>
               <button
                 type="submit"
-                className="bg-blue-600 text-white px-4 py-2 rounded-md cursor-pointer"
+                className={`bg-blue-600 flex items-center justify-center gap-2 text-white px-4 py-2 rounded-md ${
+                  isSubmitting ? "cursor-not-allowed" : "cursor-pointer"
+                }`}
                 disabled={isSubmitting}
               >
+                {isSubmitting && (
+                  <svg
+                    aria-hidden="true"
+                    className={`inline w-4 h-4  animate-spin  ${
+                      theme === "dark"
+                        ? "text-gray-200 fill-gray-600"
+                        : "fill-gray-300 text-gray-600"
+                    }`}
+                    viewBox="0 0 100 101"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                      fill="currentColor"
+                    />
+                    <path
+                      d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                      fill="currentFill"
+                    />
+                  </svg>
+                )}
+
                 {isSubmitting ? "Submitting..." : "Submit"}
               </button>
             </div>
@@ -770,7 +816,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
 
             <div className="flex gap-2  justify-end">
               <button
-                className="px-4 py-2 bg-gray-100 rounded-md text-black cursor-pointer"
+                className="px-4 py-2 cursor-pointer bg-gray-100 rounded-md text-black "
                 onClick={handleCancel}
                 disabled={isSubmitting}
               >
@@ -778,11 +824,36 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
               </button>
               <button
                 type="submit"
-                className={`bg-blue-600 text-white px-4 py-2 rounded-md ${
-                  !transactionIsDirty ? "cursor-not-allowed" : "cursor-pointer"
+                className={`bg-blue-600 flex items-center justify-center gap-2 cursor-pointer text-white px-4 py-2 rounded-md ${
+                  !transactionIsDirty || isSubmitting
+                    ? "cursor-not-allowed"
+                    : "cursor-pointer"
                 }`}
                 disabled={!transactionIsDirty || isSubmitting}
               >
+                {isSubmitting && (
+                  <svg
+                    aria-hidden="true"
+                    className={`inline w-4 h-4  animate-spin  ${
+                      theme === "dark"
+                        ? "text-gray-200 fill-gray-600"
+                        : "fill-gray-300 text-gray-600"
+                    }`}
+                    viewBox="0 0 100 101"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                      fill="currentColor"
+                    />
+                    <path
+                      d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                      fill="currentFill"
+                    />
+                  </svg>
+                )}
+
                 {isSubmitting ? "Submitting..." : "Submit"}
               </button>
             </div>
@@ -814,7 +885,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
             <div className="self-end flex items-center gap-4">
               {" "}
               <button
-                className="px-4 py-2 bg-gray-100 rounded-md text-black cursor-pointer"
+                className="px-4 py-2 cursor-pointer bg-gray-100 rounded-md text-black "
                 onClick={handleCancel}
                 disabled={isSubmitting}
               >
@@ -823,9 +894,33 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
               <button
                 type="submit"
                 onClick={handleDeleteTransaction}
-                className="bg-red-600 text-white px-4 py-2 rounded-md cursor-pointer"
+                className={`bg-red-600 flex items-center justify-center gap-2 ${
+                  isSubmitting ? "cursor-not-allowed" : "cursor-pointer"
+                } text-white px-4 py-2 rounded-md `}
                 disabled={isSubmitting}
               >
+                {isSubmitting && (
+                  <svg
+                    aria-hidden="true"
+                    className={`inline w-4 h-4  animate-spin  ${
+                      theme === "dark"
+                        ? "text-gray-200 fill-gray-600"
+                        : "fill-gray-300 text-gray-600"
+                    }`}
+                    viewBox="0 0 100 101"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                      fill="currentColor"
+                    />
+                    <path
+                      d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                      fill="currentFill"
+                    />
+                  </svg>
+                )}
                 Submit
               </button>
             </div>
@@ -892,7 +987,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
             />
             <div className="flex gap-2  justify-end">
               <button
-                className="px-4 py-2 bg-gray-100 rounded-md text-black cursor-pointer"
+                className="px-4 py-2 bg-gray-100  rounded-md text-black cursor-pointer"
                 onClick={handleCancel}
                 disabled={isSubmitting}
               >
@@ -900,9 +995,34 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
               </button>
               <button
                 type="submit"
-                className={`bg-blue-600 text-white px-4 py-2 rounded-md `}
+                className={`bg-blue-600 text-white flex items-center justify-center gap-2 ${
+                  isSubmitting ? "cursor-not-allowed" : "cursor-pointer"
+                } px-4 py-2 rounded-md `}
                 disabled={isSubmitting}
               >
+                {isSubmitting && (
+                  <svg
+                    aria-hidden="true"
+                    className={`inline w-4 h-4  animate-spin  ${
+                      theme === "dark"
+                        ? "text-gray-200 fill-gray-600"
+                        : "fill-gray-300 text-gray-600"
+                    }`}
+                    viewBox="0 0 100 101"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                      fill="currentColor"
+                    />
+                    <path
+                      d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                      fill="currentFill"
+                    />
+                  </svg>
+                )}
+
                 {isSubmitting ? "Submitting..." : "Submit"}
               </button>
             </div>
@@ -940,7 +1060,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
             />
             <div className="flex gap-2  justify-end">
               <button
-                className="px-4 py-2 bg-gray-100 rounded-md text-black cursor-pointer"
+                className="px-4 py-2  bg-gray-100 rounded-md text-black cursor-pointer"
                 onClick={handleCancel}
                 disabled={isSubmitting}
               >
@@ -948,14 +1068,38 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
               </button>
               <button
                 type="submit"
-                className={`bg-blue-600 text-white px-4 py-2 rounded-md ${
-                  !isDirty ? "cursor-not-allowed" : "cursor-pointer"
+                className={`bg-blue-600 cursor-pointer text-white px-4 py-2 flex items-center justify-center gap-2 rounded-md ${
+                  !isDirty || isSubmitting
+                    ? "cursor-not-allowed"
+                    : "cursor-pointer"
                 }`}
                 disabled={
                   (!isDirty && watchBudget === getValues().budget) ||
                   isSubmitting
                 }
               >
+                {isSubmitting && (
+                  <svg
+                    aria-hidden="true"
+                    className={`inline w-4 h-4  animate-spin  ${
+                      theme === "dark"
+                        ? "text-gray-200 fill-gray-600"
+                        : "fill-gray-300 text-gray-600"
+                    }`}
+                    viewBox="0 0 100 101"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                      fill="currentColor"
+                    />
+                    <path
+                      d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                      fill="currentFill"
+                    />
+                  </svg>
+                )}
                 Submit
               </button>
             </div>
@@ -987,7 +1131,7 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
             <div className="self-end flex items-center gap-4">
               {" "}
               <button
-                className="px-4 py-2 bg-gray-100 rounded-md text-black cursor-pointer"
+                className="px-4 py-2 bg-gray-100  rounded-md text-black cursor-pointer"
                 onClick={handleCancel}
                 disabled={isSubmitting}
               >
@@ -996,9 +1140,33 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
               <button
                 type="submit"
                 onClick={handleDeleteSubBudget}
-                className="bg-red-600 text-white px-4 py-2 rounded-md cursor-pointer"
+                className={`bg-red-600 text-white flex items-center justify-center gap-2  px-4 py-2 rounded-md ${
+                  isSubmitting ? "cursor-not-allowed" : "cursor-pointer"
+                }`}
                 disabled={isSubmitting}
               >
+                {isSubmitting && (
+                  <svg
+                    aria-hidden="true"
+                    className={`inline w-4 h-4  animate-spin  ${
+                      theme === "dark"
+                        ? "text-gray-200 fill-gray-600"
+                        : "fill-gray-300 text-gray-600"
+                    }`}
+                    viewBox="0 0 100 101"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                      fill="currentColor"
+                    />
+                    <path
+                      d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                      fill="currentFill"
+                    />
+                  </svg>
+                )}
                 Submit
               </button>
             </div>
@@ -1030,16 +1198,40 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
             <div className="self-end flex items-center gap-4">
               {" "}
               <button
-                className="px-4 py-2 bg-gray-100 rounded-md text-black cursor-pointer"
+                className="px-4 py-2 bg-gray-100 cursor-pointer rounded-md text-black "
                 onClick={handleCancel}
+                disabled={isSubmitting}
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 onClick={handleDeleteBudget}
-                className="bg-red-600 text-white px-4 py-2 rounded-md cursor-pointer"
+                className="bg-red-600 text-white flex items-center justify-center gap-2  px-4 py-2 rounded-md cursor-pointer"
+                disabled={isSubmitting}
               >
+                {isSubmitting && (
+                  <svg
+                    aria-hidden="true"
+                    className={`inline w-4 h-4  animate-spin  ${
+                      theme === "dark"
+                        ? "text-gray-200 fill-gray-600"
+                        : "fill-gray-300 text-gray-600"
+                    }`}
+                    viewBox="0 0 100 101"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                      fill="currentColor"
+                    />
+                    <path
+                      d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                      fill="currentFill"
+                    />
+                  </svg>
+                )}
                 Submit
               </button>
             </div>
@@ -1119,12 +1311,35 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
                 type="submit"
                 // disabled={!userDirty}
                 disabled={(!userDirty && !imageChanged) || isSubmitting}
-                className={`bg-blue-600 text-white px-4 py-2 rounded-md ${
+                className={`bg-blue-600 text-white px-4 py-2 flex items-center justify-center gap-2 rounded-md ${
                   (!userDirty && !imageChanged) || isSubmitting
                     ? "cursor-not-allowed"
                     : "cursor-pointer"
                 }`}
               >
+                {isSubmitting && (
+                  <svg
+                    aria-hidden="true"
+                    className={`inline w-4 h-4  animate-spin  ${
+                      theme === "dark"
+                        ? "text-gray-200 fill-gray-600"
+                        : "fill-gray-300 text-gray-600"
+                    }`}
+                    viewBox="0 0 100 101"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                      fill="currentColor"
+                    />
+                    <path
+                      d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                      fill="currentFill"
+                    />
+                  </svg>
+                )}
+
                 {isSubmitting ? "Saving..." : "Save Changes"}
               </button>
             </div>
@@ -1164,8 +1379,31 @@ const Modal = ({ id = "add", transactionId = "" }: Partial<modalProps>) => {
               <button
                 type="submit"
                 onClick={handleDeleteUsers}
-                className="bg-red-600 text-white px-4 py-2 rounded-md cursor-pointer"
+                className="bg-red-600 text-white px-4 py-2 flex items-center justify-center gap-2 rounded-md cursor-pointer"
+                disabled={isSubmitting}
               >
+                {isSubmitting && (
+                  <svg
+                    aria-hidden="true"
+                    className={`inline w-4 h-4  animate-spin  ${
+                      theme === "dark"
+                        ? "text-gray-200 fill-gray-600"
+                        : "fill-gray-300 text-gray-600"
+                    }`}
+                    viewBox="0 0 100 101"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                      fill="currentColor"
+                    />
+                    <path
+                      d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                      fill="currentFill"
+                    />
+                  </svg>
+                )}
                 Submit
               </button>
             </div>

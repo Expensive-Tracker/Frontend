@@ -77,7 +77,11 @@ function Header() {
           <Text Element="p" text="Tracker" style="font-light -mt-1.5" isDes />
         </div>
       </div>
-      <div className={`flex items-center gap-4 ${isProfilePage ? "py-1" : ""}`}>
+      <div
+        className={`flex items-center sm:gap-4 gap-2 ${
+          isProfilePage ? "py-1" : ""
+        }`}
+      >
         {theme === "dark" ? (
           <MdOutlineWbSunny
             size={24}
@@ -96,8 +100,8 @@ function Header() {
             className="flex items-center gap-2 cursor-pointer"
             onClick={handleLogOut}
           >
-            <CiLogout scale={18} />
-            Log out
+            <CiLogout scale={18} size={24} />
+            <span className="sm:block hidden">Log out</span>
           </p>
         ) : (
           <>
@@ -125,12 +129,16 @@ function Header() {
                 <IoIosArrowDown />
               </div>
               <div
-                className={`absolute md:-left-2 left-[-80px] top-[42px] md:top-[45px] z-10 w-[150px] rounded-b-md shadow-2xl px-8 py-3  flex-col items-start
+                className={`absolute lg:-left-2 left-[-80px] lg:top-[45px] top-[46px] md:top-[50px] z-10 w-[150px] rounded-b-md shadow-2xl px-8 py-3  flex-col items-start
               transition-all duration-300 ease-in-out transform origin-top   ${
                 userMenuOpen
                   ? "opacity-100 scale-100"
                   : "opacity-0 scale-95 pointer-events-none"
-              } ${theme === "dark" ? "bg-black" : "bg-white"}`}
+              } ${
+                  theme === "dark"
+                    ? "bg-[#1B1C21] border-r border-white border-b border-l"
+                    : "bg-white"
+                }`}
               >
                 <Link
                   href="/profile"

@@ -24,23 +24,24 @@ const SubCategory = ({
   const theme = useSelector((state: RootState) => state.theme.theme);
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(e.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(e.target as Node)
+      ) {
         setShowMenu(false);
       }
     };
 
     if (showMenu) {
       document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
     }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showMenu]);
 
   const data = {
@@ -142,8 +143,9 @@ const SubCategory = ({
 
         <div className="relative">
           <button
-            className={`p-2 rounded-lg transition-colors duration-200 ${colors.hoverBg}`}
+            className={`p-2 rounded-lg transition-colors duration-200 ${colors.hoverBg} cursor-pointer`}
             onClick={() => setShowMenu((pre) => !pre)}
+            ref={buttonRef}
           >
             <BsThreeDots className={`w-4 h-4 ${colors.textSecondary}`} />
           </button>
@@ -159,7 +161,7 @@ const SubCategory = ({
             }`}
           >
             <button
-              className={`w-full px-4 py-3 flex items-center gap-3 ${colors.textSecondary} ${colors.hoverBg} transition-colors duration-200`}
+              className={`w-full px-4 py-3 flex  cursor-pointer items-center gap-3 ${colors.textSecondary} ${colors.hoverBg} transition-colors duration-200`}
               onClick={() => {
                 handleAddModelEditDetail(item?._id);
                 setShowMenu(false);
@@ -172,7 +174,7 @@ const SubCategory = ({
               className={`h-px ${colors.borderColor} bg-current opacity-10`}
             ></div>
             <button
-              className={`w-full px-4 py-3 flex items-center gap-3 ${colors.danger.text} ${colors.hoverBg} transition-colors duration-200`}
+              className={`w-full px-4 py-3 flex cursor-pointer  items-center gap-3 ${colors.danger.text} ${colors.hoverBg} transition-colors duration-200`}
               onClick={() => {
                 handleAddModelDeleteDetail(item?._id);
                 setShowMenu(false);

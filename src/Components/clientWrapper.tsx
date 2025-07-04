@@ -14,6 +14,10 @@ import SplashScreen from "./splashScreen";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import navItem, { authPath } from "@/util/constant/navItem";
+import { usePathname } from "next/navigation";
+
+const noSidebarOrHeaderPaths = ["/profile"];
 
 export default function ClientWrapper({
   children,
@@ -21,12 +25,18 @@ export default function ClientWrapper({
   children: React.ReactNode;
 }) {
   const authToken = useSelector((state: RootState) => state.user.token);
+  const pathname = usePathname();
   const theme = useSelector((state: RootState) => state.theme.theme);
   const [, forUpdate] = useState<number>(0);
   const uiSideBar = useSelector((state: RootState) => state.uiSlice.sidebar);
   const splashScreen = useSelector(
     (state: RootState) => state.uiSlice.splashScreen
   );
+  const navPaths = navItem.map((item) => item.path);
+  const isDashboardPath = navPaths.includes(pathname);
+  const isAuthPath = authPath.includes(pathname);
+  const isNoLayoutPath = noSidebarOrHeaderPaths.includes(pathname);
+
   const splashFlag = useSelector(
     (state: RootState) => state.uiSlice.splashFlag
   );
@@ -60,6 +70,9 @@ export default function ClientWrapper({
     colorBodyChange();
   }, [theme]);
 
+  if (!isDashboardPath && !isAuthPath && !isNoLayoutPath) {
+    return <>{children}</>;
+  }
   return (
     <div className={`h-full transition-all`}>
       <ToastContainer

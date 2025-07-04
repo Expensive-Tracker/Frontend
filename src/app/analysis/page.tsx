@@ -40,12 +40,12 @@ const EmptyState = ({
 
   return (
     <div
-      className={`flex flex-col items-center justify-center min-h-96 p-8 rounded-lg ${
+      className={`flex flex-col items-center justify-center min-h-96 lg:p-8 p-4 rounded-lg ${
         theme === "dark"
-          ? "bg-gray-800/50 text-gray-300"
+          ? "bg-[#27282E]/20 text-gray-300"
           : "bg-white text-gray-600"
       } shadow-sm border ${
-        theme === "dark" ? "border-gray-700" : "border-gray-200"
+        theme === "dark" ? "border-white" : "border-gray-200"
       }`}
     >
       <div className="text-center">
@@ -185,7 +185,7 @@ const Analysis = () => {
   if (isNew.budgets || isNew.transaction)
     return (
       <div
-        className={`w-full flex items-center justify-center flex-col gap-4 p-8 rounded-xl ${textPrimary}`}
+        className={`w-full flex items-center justify-center flex-col gap-4 p-4 lg:p-8 rounded-xl ${textPrimary}`}
       >
         <div
           className={`p-4 rounded-full ${
@@ -244,7 +244,6 @@ const Analysis = () => {
           theme={theme}
           title="No Analytics Data Available"
           description="Start adding income and expense transactions to see your financial analytics and insights."
-          icon="📊"
         />
       </div>
     );
@@ -294,7 +293,7 @@ const Analysis = () => {
             },
           }}
           colors={["#4ade80", "#f87171"]}
-          className={`w-full p-6 rounded-lg border ${
+          className={`w-full lg:p-6 p-4 rounded-lg border ${
             theme === "dark" ? "bg-[#27282E]/20" : "bg-white border-gray-200"
           } shadow-sm `}
         />
@@ -319,7 +318,7 @@ const Analysis = () => {
             },
           }}
           colors={["#6366f1", "#f59e0b", "#10b981", "#ec4899", "#f97316"]}
-          className={`w-full p-6 rounded-lg border ${
+          className={`w-full lg:p-6 p-4 rounded-lg border ${
             theme === "dark" ? "bg-[#27282E]/20" : "bg-white border-gray-200"
           } shadow-sm `}
         />
@@ -360,7 +359,7 @@ const Analysis = () => {
             },
           }}
           colors={["#60a5fa", "#f87171"]}
-          className={`w-full p-6 rounded-lg border ${
+          className={`w-full lg:p-6 p-4 rounded-lg border ${
             theme === "dark" ? "bg-[#27282E]/20" : "bg-white border-gray-200"
           } shadow-sm `}
         />
@@ -371,8 +370,6 @@ const Analysis = () => {
           description="Add income and expense data to see monthly comparisons."
         />
       )}
-
-      {/* Summary Cards */}
     </div>
   );
 };

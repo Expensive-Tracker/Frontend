@@ -8,6 +8,7 @@ import { RootState } from "@/store/store";
 import {
   handleHoverIn,
   handleHoverOut,
+  handleMobileMenuOpen,
   handleOpenAndClose,
 } from "@/store/slice/uiSlice";
 import { usePathname } from "next/navigation";
@@ -29,29 +30,27 @@ const SideBar = () => {
       document.body.classList.remove("overflow-hidden");
     };
   }, [uiData.mobileOpen]);
-  const handleMouseEnter = () => {
-    dispatch(handleHoverIn());
-  };
 
   const handleShowMenu = () => {
     dispatch(handleOpenAndClose());
   };
-  const handleMouseLeave = () => {
-    dispatch(handleHoverOut());
-  };
+
   const sidebarWidth =
     uiData.isOpen || uiData.isHovered ? "w-[220px]" : "w-[60px]";
 
   return (
     <nav>
       <div
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        className={`fixed ${sidebarWidth} z-50 left-0 top-0 h-full ${
+        onMouseEnter={() => {
+          dispatch(handleHoverIn());
+        }}
+        onMouseLeave={() => {
+          dispatch(handleHoverOut());
+        }}
+        className={`fixed hidden lg:block ${sidebarWidth} z-50 left-0 top-0 h-full  ${
           theme === "dark" ? "bg-[#1B1C21]" : "bg-white"
         } border-r border-collapse lg:block hidden border-r-[#27282E] transition-all `}
       >
-        {/* sidebar header */}
         <div
           className={`px-6 py-1 pb-2.5 ${
             uiData.isOpen || uiData.isHovered ? "" : " mt-4 pl-4.5 py-[5px]"
@@ -94,7 +93,6 @@ const SideBar = () => {
             </svg>
           </div>
         </div>
-        {/* sideBar body */}
         <div className={`px-3 py-4 h-full overflow-y-hidden`}>
           <ul className="flex items-start gap-2.5 flex-col">
             {navItem.map((item: navItemInterface) => {
@@ -136,11 +134,13 @@ const SideBar = () => {
         </div>
       </div>
       {/* mobile */}
+
       <div
-        className={`lg:hidden absolute grid grid-cols-[200px_auto] items-start h-full w-screen z-[1000] -top-1.5  transition-all ${
+        className={`fixed lg:hidden inset-0 z-[1000] grid grid-cols-[220px_auto] top-[59px] md:top-[67px] transition-transform duration-300 ${
           uiData.mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
+        {/* Sidebar */}
         <div
           className={`h-full shadow z-[100] ${
             theme === "dark" ? "bg-[#1B1C21]" : "bg-white"
@@ -149,12 +149,9 @@ const SideBar = () => {
           <div className="px-3 py-4 h-full">
             <ul className="flex items-start gap-5 flex-col">
               {navItem.map((item: navItemInterface) => {
-                const isExpanded = uiData.isOpen || uiData.isHovered;
                 const isActive = pathname === item.path;
 
-                const commonClasses = `flex items-center w-full gap-2 text-base focus:outline-none ${
-                  isExpanded ? "py-3 px-3" : "py-3 px-2"
-                } rounded-md transition-all cursor-pointer w-full ${
+                const commonClasses = `flex items-center w-full gap-2 text-base focus:outline-none py-3 px-3 rounded-md transition-all cursor-pointer ${
                   isActive
                     ? theme === "dark"
                       ? "text-white bg-[#27282E] shadow shadow-[#27282E]"
@@ -164,37 +161,29 @@ const SideBar = () => {
                     : "hover:bg-black hover:text-white hover:shadow hover:shadow-[#27282E]"
                 }`;
 
-                if (isExpanded) {
-                  return (
-                    <Link
-                      href={item.path}
-                      key={item.id}
-                      className={commonClasses}
-                    >
-                      <span className="!text-xl">{item.icon}</span>
-                      <span>{item.navName}</span>
-                    </Link>
-                  );
-                } else {
-                  return (
-                    <Link
-                      key={item.id}
-                      href={item.path}
-                      className={commonClasses}
-                    >
-                      <span className="!text-xl">{item.icon}</span>
-                    </Link>
-                  );
-                }
+                return (
+                  <Link
+                    href={item.path}
+                    key={item.id}
+                    className={commonClasses}
+                    onClick={() => dispatch(handleMobileMenuOpen())}
+                  >
+                    <span className="!text-xl">{item.icon}</span>
+                    <span>{item.navName}</span>
+                  </Link>
+                );
               })}
             </ul>
           </div>
         </div>
+
+        {/* Backdrop */}
         <div
+          onClick={() => dispatch(handleMobileMenuOpen())}
           className={`h-full bg-black/20 backdrop-blur-sm z-[50] transition-opacity duration-300 ${
-            uiData.mobileOpen ? "opacity-100" : "opacity-0"
+            uiData.mobileOpen ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
-        ></div>
+        />
       </div>
     </nav>
   );

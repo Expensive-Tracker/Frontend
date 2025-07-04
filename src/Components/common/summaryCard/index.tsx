@@ -71,7 +71,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
   ];
 
   return (
-    <div className="flex flex-col md:flex-row items-center flex-wrap  gap-4 p-4">
+    <div className="flex flex-col md:flex-row items-center flex-wrap  gap-4 ">
       {cards.map((card, index) => {
         const IconComponent = card.icon;
         return (
@@ -95,7 +95,6 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
               </p>
             </div>
 
-            {/* Optional trend indicator */}
             <div className="mt-3">
               <p className={`text-xs ${textSecondary}`}>
                 {card.title === "Total Income" && "Money received"}

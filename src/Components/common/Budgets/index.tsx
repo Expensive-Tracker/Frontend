@@ -32,9 +32,10 @@ interface props {
   handleModelOpen: (id: string) => void;
   setIsLoading: (id: boolean) => void;
   loading: boolean;
+  month?: any;
+  seyNoBudgetHistory: (id: boolean) => void;
 }
 
-// Skeleton Loader Component
 const BudgetSkeleton = ({ theme }: { theme: string }) => {
   const bgColor = theme === "dark" ? "bg-zinc-900" : "bg-white";
   const borderColor = theme === "dark" ? "border-zinc-700" : "border-gray-200";
@@ -48,13 +49,11 @@ const BudgetSkeleton = ({ theme }: { theme: string }) => {
     <div
       className={`flex flex-col gap-6 p-6 rounded-xl shadow-lg transition-colors duration-300 ${bgColor} ${borderColor} border animate-pulse`}
     >
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className={`h-6 w-32 rounded ${skeletonBg} animate-shimmer`}></div>
         <div className={`h-8 w-8 rounded-lg ${skeletonBg}`}></div>
       </div>
 
-      {/* Main Budget Display */}
       <div
         className={`p-4 rounded-lg ${skeletonBg} border-l-4 border-l-gray-400`}
       >
@@ -66,7 +65,6 @@ const BudgetSkeleton = ({ theme }: { theme: string }) => {
         ></div>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {[1, 2].map((item) => (
           <div
@@ -88,7 +86,6 @@ const BudgetSkeleton = ({ theme }: { theme: string }) => {
         ))}
       </div>
 
-      {/* Budget Health */}
       <div
         className={`flex items-center justify-between p-3 rounded-lg ${skeletonBg}`}
       >
@@ -108,7 +105,13 @@ const BudgetSkeleton = ({ theme }: { theme: string }) => {
   );
 };
 
-const BudgetArea = ({ handleModelOpen, setIsLoading, loading }: props) => {
+const BudgetArea = ({
+  handleModelOpen,
+  setIsLoading,
+  loading,
+  month,
+  seyNoBudgetHistory,
+}: props) => {
   const isNew = useSelector((state: RootState) => state.user.isNew);
   const theme = useSelector((state: RootState) => state.theme.theme);
   const userId = useSelector((state: RootState) => state.user.userDetail._id);
@@ -117,6 +120,7 @@ const BudgetArea = ({ handleModelOpen, setIsLoading, loading }: props) => {
   const [edit, setEdit] = useState<boolean>(false);
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [showForm, setShowForm] = useState<boolean>(false);
+  const [hasBudgetHistory, setHasBudgetHistory] = useState<boolean>(false);
   const [hasBudget, setHasBudget] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -194,29 +198,30 @@ const BudgetArea = ({ handleModelOpen, setIsLoading, loading }: props) => {
     },
     resolver: yupResolver(budgetSchema),
   });
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(e.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(e.target as Node)
+      ) {
         setShowMenu(false);
       }
     };
 
     if (showMenu) {
       document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
     }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showMenu]);
 
   useEffect(() => {
     if (refetch) dispatch(handleRefetch());
     getUserBudget();
-  }, [refetch]);
+  }, [refetch, month]);
 
   useEffect(() => {
     const userHasBudget = budgets && budgets._id && budgets.budgetAmount;
@@ -228,20 +233,34 @@ const BudgetArea = ({ handleModelOpen, setIsLoading, loading }: props) => {
   }, [budgets, isNew, dispatch]);
 
   const getUserBudget = async () => {
+    setHasBudgetHistory(false);
+    seyNoBudgetHistory(false);
     try {
       setIsLoading(true);
-      const result = await handleGetUserBudget(userId);
-      if (!result) {
-        setIsLoading(false);
+      let result;
+      if (month) {
+        result = await handleGetUserBudget(userId, month);
+      } else {
+        result = await handleGetUserBudget(userId);
+      }
+
+      if (!result || result?.budget === null) {
+        setHasBudget(false);
         return;
       }
       dispatch(handleSetBudget(result?.budget));
       dispatch(handleSetRemainFalse("budgets"));
       setHasBudget(true);
     } catch (err: any) {
-      if (err?.response?.status === 404) {
-        dispatch(handleSetRemainTrue("budgets"));
+      if (
+        err?.response?.data?.message ===
+        "Budget history not available for this month."
+      ) {
+        setHasBudgetHistory(true);
+        seyNoBudgetHistory(true);
+      } else if (err?.response?.data?.message === "No budget found for user.") {
         setHasBudget(false);
+        dispatch(handleSetRemainTrue("budgets"));
       } else {
         console.error("Error fetching user budget:", err?.message);
       }
@@ -367,6 +386,31 @@ const BudgetArea = ({ handleModelOpen, setIsLoading, loading }: props) => {
     );
   }
 
+  if (hasBudgetHistory) {
+    return (
+      <div
+        className={`w-full flex items-center justify-center flex-col gap-4 p-8 rounded-xl  ${textPrimary} `}
+      >
+        <div
+          className={`p-4 rounded-full ${
+            theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"
+          }`}
+        >
+          <AiOutlineLineChart
+            className={`text-3xl ${
+              theme === "dark" ? "text-blue-400" : "text-blue-600"
+            }`}
+          />
+        </div>
+        <div className="text-center">
+          <h3 className={`text-lg font-semibold mb-2 ${textPrimary}`}>
+            No Budget for this month
+          </h3>
+        </div>
+      </div>
+    );
+  }
+
   // Show form for creating or editing budget
   if (showForm || edit) {
     return (
@@ -409,7 +453,7 @@ const BudgetArea = ({ handleModelOpen, setIsLoading, loading }: props) => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className={`w-full py-3 rounded-lg text-lg font-medium transition-all duration-200 ${
+          className={`w-full py-3 rounded-lg text-lg cursor-pointer font-medium transition-all duration-200 ${
             buttonColors.success
           } ${
             isSubmitting ? "opacity-50 cursor-not-allowed" : ""
@@ -437,8 +481,9 @@ const BudgetArea = ({ handleModelOpen, setIsLoading, loading }: props) => {
 
         <div className="relative">
           <button
-            className={`p-2 rounded-lg transition-colors duration-200 ${menuColors.hoverBg}`}
+            className={`p-2 rounded-lg cursor-pointer transition-colors duration-200 ${menuColors.hoverBg}`}
             onClick={() => setShowMenu((prev) => !prev)}
+            ref={buttonRef}
           >
             <BsThreeDots className={`w-4 h-4 ${textSecondary}`} />
           </button>
@@ -454,7 +499,7 @@ const BudgetArea = ({ handleModelOpen, setIsLoading, loading }: props) => {
             }`}
           >
             <button
-              className={`w-full px-4 py-3 flex items-center gap-3 ${textSecondary} ${menuColors.hoverBg} transition-colors duration-200`}
+              className={`w-full px-4 py-3 flex cursor-pointer items-center gap-3 ${textSecondary} ${menuColors.hoverBg} transition-colors duration-200`}
               onClick={() => {
                 setEdit(true);
                 setShowMenu(false);
@@ -465,7 +510,7 @@ const BudgetArea = ({ handleModelOpen, setIsLoading, loading }: props) => {
             </button>
             <div className={`h-px ${borderColor} bg-current opacity-10`}></div>
             <button
-              className={`w-full px-4 py-3 flex items-center gap-3 ${menuColors.danger.text} ${menuColors.hoverBg} transition-colors duration-200`}
+              className={`w-full px-4 py-3 flex cursor-pointer items-center gap-3 ${menuColors.danger.text} ${menuColors.hoverBg} transition-colors duration-200`}
               onClick={handleDeleteBudget}
             >
               <MdDelete className="w-4 h-4" />

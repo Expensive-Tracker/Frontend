@@ -18,9 +18,9 @@ export async function handleAddBudget(body: any) {
   }
 }
 
-export async function handleGetUserBudget(id: string) {
+export async function handleGetUserBudget(id: string, month?: any) {
   const result: any = await axiosInstance.get(
-    `${budgetEndpoints.allBudgets.replace(":id", id)}`
+    `${budgetEndpoints.allBudgets.replace(":id", id)}?month=${month}`
   );
   return result.data;
 }

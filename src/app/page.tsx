@@ -214,7 +214,7 @@ export default function Home() {
         balance={data?.summary?.balance}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 p-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3  p-0 mt-6  gap-6">
         <DynamicChart
           type="pie"
           series={pieChartSeries}
@@ -264,13 +264,12 @@ export default function Home() {
           />
         ) : (
           <div
-            className={`flex flex-col h-full items-center justify-center w-full lg:col-span-2 p-6 rounded-lg text-center ${
-              theme === "dark"
-                ? "bg-gray-800/50 text-gray-300"
-                : "bg-white text-gray-600"
-            } shadow-sm border ${
-              theme === "dark" ? "border-gray-700" : "border-gray-200"
-            }`}
+            className={`flex flex-col h-full items-center justify-center w-full xl:col-span-2 md:p-6 p-4  rounded-lg text-center 
+              shadow-sm border ${
+                theme === "dark"
+                  ? "bg-[#27282E]/20"
+                  : "bg-white border-gray-200"
+              }`}
           >
             <p className="text-xl font-semibold mb-2 text-center">
               No Expense Data Available
@@ -284,7 +283,7 @@ export default function Home() {
 
       {data.transactionData.length > 0 && (
         <div
-          className={`p-4 m-4 rounded-xl border ${
+          className={`md:p-4 p-2  mt-6 rounded-xl border ${
             theme === "dark" ? "bg-[#27282E]/20" : "bg-gray-100 border-gray-200"
           }  shadow-sm`}
         >

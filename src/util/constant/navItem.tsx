@@ -31,4 +31,6 @@ const navItem: navItemInterface[] = [
   },
 ];
 
+export const authPath: string[] = ["/auth/signin", "/auth/signup"];
+
 export default navItem;
